@@ -918,13 +918,13 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * setting has not effect on optgroup's attribute label
 					 */
 					$VMaX = new SimpleAssembler($this -> Elements['mid'], $this -> Elements['sub']);
-					$VMaX -> Set_ContentUsage(MarC::MARC_OPTION_ATTRIBUTEVALUE, MarC::MARC_OPTION_ELEMENTTEXT, 'value');
-					
+					$VMaX -> Set_ContentUsage(MarC::MARC_OPTION_ATTRIBUTEVALUE, MarC::MARC_OPTION_ELEMENTTEXT, $this -> SpecialAttributes['sub']);
+
 					if(isset($this -> SpecialAttributes['mid']))
 					{
-						$VMaX -> Set_TopLevelAttributes($this -> SpecialAttributes['mid'], $MidLevel);
+						$VMaX -> Set_TopLevelAttributes($this -> SpecialAttributes['mid'], $TopLevel);
 					}
-					
+
 					/*
 					 * part 2;
 					 * sets styles for optgroup
@@ -936,7 +936,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 							$VMaX -> Set_TopLevelStyles($Name, $Value);
 						}
 					}
-					
+
 					/*
 					 * part 3;
 					 * sets attributes for optgroup
@@ -948,7 +948,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 							$VMaX -> Set_TopLevelAttributes($Name, $Value);
 						}
 					}
-					
+
 					$OrderMidLevel++;
 					
 					/*
@@ -999,9 +999,19 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 */
 					$VMaX = new CodeGenerator(($this -> Enable_CorrectOrder == TRUE ? $this -> Elements['mid'] : $this -> Elements['sub'] ));
 					
-					if(isset($this -> SpecialAttributes['mid']))
+					if($this -> Enable_CorrectOrder == TRUE)
 					{
-						$VMaX -> Set_Attribute($this -> SpecialAttributes['mid'], $MidLevel);
+						if(isset($this -> SpecialAttributes['mid']))
+						{
+							$VMaX -> Set_Attribute($this -> SpecialAttributes['mid'], $TopLevel);
+						}
+					}
+					else
+					{
+						if(isset($this -> SpecialAttributes['sub']))
+						{
+							$VMaX -> Set_Attribute($this -> SpecialAttributes['sub'], $TopLevel);
+						}
 					}
 					
 					/*
@@ -1118,12 +1128,12 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 			 */
 			$this -> LocalCode = array();
 			
-			foreach($this -> Content as $MidLevel => $SubLevel)
+			foreach($this -> Content as $TopLevel => $MidLevel)
 			{
 				/*
 				 * creation of optgroup part of select menu
 				 */
-				if(is_array($SubLevel))
+				if(is_array($MidLevel))
 				{
 					/*
 					 * part 1;
@@ -1135,14 +1145,14 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					
 					if(isset($this -> SpecialAttributes['mid']))
 					{
-						$VMaX -> Set_TopLevelAttributes($this -> SpecialAttributes['mid'], $MidLevel);
+						$VMaX -> Set_TopLevelAttributes($this -> SpecialAttributes['mid'], $TopLevel);
 					}
 					
 					/*
 					 * part 2;
 					 * searching for selected value in optgroup part of select menu
 					 */
-					$Coords = array_search($this -> DefaultOption, array_values($SubLevel));
+					$Coords = array_search($this -> DefaultOption, array_values($MidLevel));
 					
 					/*
 					 * part 3;
@@ -1150,7 +1160,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 */
 					if($Coords !== FALSE)
 					{
-						$VMaX -> Set_SubLevelAttributes(array_search($this -> DefaultOption, array_values($Options)), $this -> SpecialAttributes['chc'], $this -> SpecialAttributes['chc']);
+						$VMaX -> Set_SubLevelAttributes(array_search($this -> DefaultOption, array_values($MidLevel)), $this -> SpecialAttributes['chc'], $this -> SpecialAttributes['chc']);
 					}
 					
 					/*
@@ -1185,7 +1195,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * sets styles for options;
 					 * sets attributes for options;
 					 */
-					foreach($Options as $Key => $Value)
+					foreach($MidLevel as $Key => $Value)
 					{
 						$VMaX -> Set_Content($Key, $Value);
 						
@@ -1236,9 +1246,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 2;
 					 * sets attribute selected to topion of default value
 					 */
-					if($Options == $this -> DefaultOption)
+					if($MidLevel == $this -> DefaultOption)
 					{
-						$VMaX -> Set_Attribute('selected', 'selected');
+						$VMaX -> Set_Attribute($this -> SpecialAttributes['chc'], $this -> SpecialAttributes['chc']);
 					}
 					
 					/*
@@ -1272,10 +1282,10 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * code export
 					 */
 					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
-					$VMaX -> Set_Text($Options);
+					$VMaX -> Set_Text($MidLevel);
 					$this -> LocalCode[] = $VMaX -> Execute();
 					
-					$OrderOptions++;
+					$OrderSubLevel++;
 				}
 			}
 		}
@@ -1286,12 +1296,43 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 *
 	 * @return string|void
 	 *
-	 * @throws MarC_Exception if form name was not set
+	 * @throws MarC_Exception if mid-level content attribute was not set
+	 * @throws MarC_Exception if sub-level content attribute was not set
 	 */
 	public function Execute()
 	{
 		/*
-		 * decision if option with default value will be marked with attribute selected or not
+		 * checks if sub-level content attribute was set (it means for example value in option)
+		 */
+		try
+		{
+			if(!isset($this -> SpecialAttributes['sub']))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_VAR, UniCAT::UNICAT_EXCEPTIONS_SEC_VAR_ARRKDMDFUNCTION2);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_VariableNameAsText($this -> SpecialAttributes), 'sub', 'Set_BottomLevelContentAttribute');
+		}
+		
+		/*
+		 * checks if mid-level content attribute was set (it means for example label in optgroup)
+		 */
+		try
+		{
+			if(!isset($this -> SpecialAttributes['mid']))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_VAR, UniCAT::UNICAT_EXCEPTIONS_SEC_VAR_ARRKDMDFUNCTION2);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_VariableNameAsText($this -> SpecialAttributes), 'mid', 'Set_MidLevelContentAttribute');
+		}
+		
+		/*
+		 * decision if option with default value will be marked with choice attribute or not
 		 */
 		if($this -> DefaultOption == FALSE)
 		{
@@ -1299,6 +1340,18 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		else
 		{
+			try
+			{
+				if(!isset($this -> SpecialAttributes['chc']))
+				{
+					throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_VAR, UniCAT::UNICAT_EXCEPTIONS_SEC_VAR_ARRKDMDFUNCTION2);
+				}
+			}
+			catch(MarC_Exception $Exception)
+			{
+				$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_VariableNameAsText($this -> SpecialAttributes), 'chc', 'Set_SubLevelChoiceAttribute');
+			}
+			
 			$this -> Get_AssembledCode_WithDefaultOption();
 		}
 		
