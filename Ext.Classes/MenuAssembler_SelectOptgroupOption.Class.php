@@ -10,7 +10,7 @@ use UniCAT\UniCAT;
  * @package VMaX-MarC
  *
  * @author Václav Macùrek <VaclavMacurek@seznam.cz>
- * @copyright 2014, Václav Macùrek
+ * @copyright 2014 - 2015 Václav Macùrek
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  */
@@ -27,6 +27,9 @@ final class MenuAssembler_SelectOptgroupOption extends DualAssembler
 		parent::__construct('select', 'optgroup', 'option');
 		$this -> Set_Comment('menu start', UniCAT::UNICAT_OPTION_ABOVE);
 		$this -> Set_Comment('menu end', UniCAT::UNICAT_OPTION_BELOW);
+		$this -> Set_MidLevelContentAttribute('label');
+		$this -> Set_BottomLevelContentAttribute('value');
+		$this -> Set_ChoiceAttribute('selected');
 	}
 	
 	/**
