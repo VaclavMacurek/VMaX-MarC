@@ -10,8 +10,8 @@ use UniCAT\Comments;
 /**
  * @package VMaX-MarC
  *
- * @author Václav Macùrek <VaclavMacurek@seznam.cz>
- * @copyright 2014 - 2015, Václav Macùrek
+ * @author Vï¿½clav Macï¿½rek <VaclavMacurek@seznam.cz>
+ * @copyright 2014 - 2015, Vï¿½clav Macï¿½rek
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
@@ -44,6 +44,13 @@ class UniqueAssembler extends ElementListSetting
 	 * @var array
 	 */
 	protected $Content = array();
+	/**
+	 * namespace;
+	 * for namespaced elements
+	 *
+	 * @var string
+	 */
+	protected $ElementsNamespace = FALSE;
 	
 	/**
 	 * sets elements for main (top) and secondary (sub) level;
@@ -152,7 +159,8 @@ class UniqueAssembler extends ElementListSetting
 	
 	/**
 	 * allows to call functions with names of created elements;
-	 * use function with name Element_Style or Element_Attribute where Element means used element and Style or Attribute is instruction how parameters will be processed
+	 * use function with name Element_Style or Element_Attribute where Element means used element and Style or Attribute is instruction how parameters will be processed;
+	 * for namespaced element use method Set_ElementsNamespace before
 	 *
 	 * @param string $Function
 	 * @param array $Parameters
@@ -162,6 +170,7 @@ class UniqueAssembler extends ElementListSetting
 	public function __call($Function, array $Parameters)
 	{
 		$Options = array('Style', 'Attribute');
+		$this -> ElementsNamespace = ($this -> ElementsNamespace == FALSE ? "" : $this -> ElementsNamespace);
 		
 		if(method_exists($this, $Function))
 		{
@@ -181,7 +190,7 @@ class UniqueAssembler extends ElementListSetting
 				$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], $Function, '/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute)/i');
 			}
 			
-			$Element = strtolower($Parts['Element']);
+			$Element = $this -> ElementsNamespace.':'.strtolower($Parts['Element']);
 			$Order = $Parts['Order'];
 			
 			try
@@ -255,6 +264,40 @@ class UniqueAssembler extends ElementListSetting
 	public function Set_DisableTopLevel()
 	{
 		$this -> Disable_TopLevel = TRUE;
+	}
+	
+	/**
+	 * allows using of namespaced elements
+	 *
+	 * @return void
+	 */
+	public function Set_ElementsNamespace($Namespace=FALSE)
+	{
+		try
+		{
+			if(empty($Namespace))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+		}
+		
+		try
+		{
+			if(preg_match('/[a-zA-Z]/', $Namespace))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_WRONGREGEX);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), $Namespace, '[a-zA-Z]');
+		}
+		
+		$this -> ElementsNamespace = $Namespace;
 	}
 	
 	/**
