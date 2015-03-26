@@ -10,8 +10,8 @@ use UniCAT\Comments;
 /**
  * @package VMaX-MarC
  *
- * @author V�clav Mac�rek <VaclavMacurek@seznam.cz>
- * @copyright 2014 - 2015, V�clav Mac�rek
+ * @author Václav Macůrek <VaclavMacurek@seznam.cz>
+ * @copyright 2014 - 2015, Václav Macůrek
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
