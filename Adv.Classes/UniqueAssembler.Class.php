@@ -65,6 +65,8 @@ class UniqueAssembler extends ElementListSetting
 	 * @throws MarC_Exception if sub elements was not set
 	 * @throws MarC_Exception if top element is the same as one of sub elements
 	 * @throws MarC_Exception if sub elements are not unique
+	 *
+	 * @example new UniqueAssembler('html', array('head', 'body') );
 	 */
 	public function __construct($TopElement="", $SubElements="")
 	{
@@ -160,18 +162,20 @@ class UniqueAssembler extends ElementListSetting
 	/**
 	 * allows to call functions with names of created elements;
 	 * use function with name Element_Style or Element_Attribute where Element means used element and Style or Attribute is instruction how parameters will be processed;
+	 * use function with name Element_ValuesSeparator where Element means used element;
 	 * for namespaced element use method Set_ElementsNamespace before
 	 *
 	 * @param string $Function
 	 * @param array $Parameters
 	 *
 	 * @throws MarC_Exception if function was set in wrong way
+	 *
+	 * @example Body_Style('background-image', 'example.svg');
+	 * @example Input_Attribute('type', 'text');
+	 * @example Select_ValuesSeparator('class', "\x20");
 	 */
 	public function __call($Function, array $Parameters)
 	{
-		$Options = array('Style', 'Attribute');
-		$this -> ElementsNamespace = ($this -> ElementsNamespace == FALSE ? "" : $this -> ElementsNamespace);
-		
 		if(method_exists($this, $Function))
 		{
 			call_user_func_array(array($this, $Function), $Parameters);
@@ -180,47 +184,38 @@ class UniqueAssembler extends ElementListSetting
 		{
 			try
 			{
-				if(!preg_match('/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute)/i', $Function, $Parts))
+				if(preg_match('/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute|ValuesSeparator)/i', $Function, $Parts))
+				{
+					try
+					{
+						if(strtolower($Parts['Element']) != $this -> Elements['top'] && !in_array(strtolower($Parts['Element']), $this -> Elements['sub']))
+						{
+							throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_DMDOPTION, MarC::MARC_EXCEPTIONS_XPLN_USEDELMT);
+						}
+					}
+					catch(MarC_Exception $Exception)
+					{
+						array_unshift($this -> Elements['sub'], $this -> Elements['top']);
+						$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], $this -> Elements['sub']);
+					}
+					
+					if($Parts['Order'] == 'ValuesSeparator')
+					{
+						$this -> Set_ValuesSeparators($Parts, $Parameters);
+					}
+					else
+					{
+						$this -> Set_StylesAttributes($Parts, $Parameters);
+					}
+				}
+				else
 				{
 					throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_WRONGREGEX);
 				}
 			}
 			catch(MarC_Exception $Exception)
 			{
-				$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], $Function, '/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute)/i');
-			}
-			
-			$Element = $this -> ElementsNamespace.':'.strtolower($Parts['Element']);
-			$Order = $Parts['Order'];
-			
-			try
-			{
-				if($Element != $this -> Elements['top'] && !in_array($Element, $this -> Elements['sub']))
-				{
-					throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_DMDOPTION, MarC::MARC_EXCEPTIONS_XPLN_USEDELMT);
-				}
-			}
-			catch(MarC_Exception $Exception)
-			{
-				array_unshift($this -> Elements['sub'], $this -> Elements['top']);
-				$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], $this -> Elements['sub']);
-			}
-			
-			if($Order == $Options[0])
-			{
-				if($this -> Check_StyleName($Parameters[0]))
-				{
-					 array_unshift($Parameters, $Element);
-					 call_user_func_array(array($this, 'Set_AllElementsStyles'), $Parameters);
-				}
-			}
-			else
-			{
-				if($this -> Check_AttributeName($Parameters[0]))
-				{
-					 array_unshift($Parameters, $Element);
-					 call_user_func_array(array($this, 'Set_AllElementsAttributes'), $Parameters);
-				}
+				$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], $Function, '/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute|ValuesSeparator)/i');
 			}
 		}
 	}
@@ -234,6 +229,8 @@ class UniqueAssembler extends ElementListSetting
 	 *
 	 * @throws MarC_Exception if content item was set wrong
 	 * @throws MarC_Exception if content item was not as string, integer or double
+	 *
+	 * @example Set_Content('example');
 	 */
 	public function Set_Content($Item="")
 	{
@@ -267,15 +264,18 @@ class UniqueAssembler extends ElementListSetting
 	}
 	
 	/**
-	 * allows using of namespaced elements
+	 * allows using of namespaced elements;
+	 * it is not allowed to combine namespaces
 	 *
 	 * @return void
+	 *
+	 * @example Set_ElementsNamespace('xsl');
 	 */
 	public function Set_ElementsNamespace($Namespace=FALSE)
 	{
 		try
 		{
-			if(empty($Namespace))
+			if(empty($Namespace) || $Namespace == FALSE)
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
 			}
@@ -298,6 +298,48 @@ class UniqueAssembler extends ElementListSetting
 		}
 		
 		$this -> ElementsNamespace = $Namespace;
+	}
+	
+	/**
+	 * sets styles and attributes
+	 */
+	private function Set_StylesAttributes($Parts, $Parameters)
+	{
+		$Order = $Parts['Order'];
+		$Options = array('Style', 'Attribute');
+		$Element = $this -> ElementsNamespace == FALSE ? strtolower($Parts['Element']) : $this -> ElementsNamespace.':'.strtolower($Parts['Element']);
+			
+		if($Order == $Options[0])
+		{
+			if($this -> Check_StyleName($Parameters[0]))
+			{
+				array_unshift($Parameters, $Element);
+				call_user_func_array(array($this, 'Set_AllElementsStyles'), $Parameters);
+			}
+		}
+		else
+		{
+			if($this -> Check_AttributeName($Parameters[0]))
+			{
+				array_unshift($Parameters, $Element);
+				call_user_func_array(array($this, 'Set_AllElementsAttributes'), $Parameters);
+			}
+		}
+	}
+	
+	/**
+	 *
+	 */
+	private function Set_ValuesSeparators($Parts, $Parameters)
+	{
+		$Order = $Parts['Order'];
+		$Element = $this -> ElementsNamespace == FALSE ? strtolower($Parts['Element']) : $this -> ElementsNamespace.':'.strtolower($Parts['Element']);
+			
+		if(in_array($Parameters[1], MarC::Show_Options_ValuesSeparation()))
+		{
+			array_unshift($Parameters, $Element);
+			call_user_func_array(array($this, 'Set_SelectedValuesSeparators'), $Parameters);
+		}
 	}
 	
 	/**

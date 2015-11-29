@@ -73,6 +73,9 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 *
 	 * @throws MarC_Exception if element name was not set
 	 * @throws MarC_Exception if XML-style was enabled by wrong option
+	 *
+	 * @example new CodeGenerator('a');
+	 * @example new CodeGenerator('input', TRUE);
 	 */
 	public function __construct($Element="", $XMLStyle=NULL)
 	{
@@ -116,7 +119,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		 */
 		if($this -> Check_ElementName($Element))
 		{
-			$this -> Element = $this -> Check_ElementAvailable($Element);
+			$this -> Element = $this -> Check_IsElementAvailable($Element);
 			self::$List_UsedElements[] = $this -> Element;
 		}
 	}
@@ -132,6 +135,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 * enables creation of one-line element
 	 *
 	 * @return void
+	 *
 	 * @throws nothing
 	 */
 	public function Set_EnableOneLineElement()
@@ -158,7 +162,9 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 *
 	 * @return void
 	 *
-	 * @throws MarC_Exception nothing
+	 * @example Set_DisableIndention();
+	 * @example Set_DisableIndention('textarea');
+	 * @example Set_DisableIndention('textarea', 'form');
 	 */
 	public function Set_DisableIndention($Elements="")
 	{
@@ -186,7 +192,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 			 * empty value has the same effect as non-set value
 			 */
 			case 1:
-				$Element = $this -> Check_ElementAvailable($Elements[0]);
+				$Element = $this -> Check_IsElementAvailable($Elements[0]);
 				
 				if(empty($Element))
 				{
@@ -396,6 +402,8 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 * @return void
 	 *
 	 * @throws MarC_Exception if style name was not set
+	 *
+	 * @example Set_Style('font-family', 'sans-serif');
 	 */
 	public function Set_Style($Name="", $Value="")
 	{
@@ -428,6 +436,9 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 * @throws MarC_Exception if attribute name was not set
 	 * @throws MarC_Exception if attribute value was not set (if attributes without value were not enabled)
 	 * @throws MarC_Exception if attribute value was not set as string, integer or double
+	 *
+	 * @example Set_Attribute('id', 'example');
+	 * @example Set_Attribute('points', array(110, 225, 254, 100) );
 	 */
 	public function Set_Attribute($Name="", $Value="")
 	{
@@ -445,7 +456,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		
 		/*
 		 * attribute value may be empty;
-		 * empty values for attributes MUST be enabled
+		 * empty values for attributes MUST be enabled by using of separated function (Set_EnableNoValueAttributes)
 		 */
 		try
 		{
@@ -469,13 +480,36 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 			{
 				try
 				{
-					if(!in_array(gettype($Value), MarC::Show_Options_Scalars()))
+					if(!in_array(gettype($Value), MarC::Show_Options_Basics()))
 					{
 						throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_WRONGVALTYPE);
 					}
 					else
 					{
-						$this -> Set_AllElementsAttributes($this -> Element, $Name, $Value);
+						if(in_array(gettype($Value), MarC::Show_Options_Scalars()))
+						{
+							$this -> Set_AllElementsAttributes($this -> Element, $Name, $Value);
+						}
+						else
+						{
+							if(key_exists($Name, $this -> ValuesSeparators_Global))
+							{
+								/*
+								 * selected option for sticking of multiple values;
+								 * if character was set for current attribute
+								 */
+								$this -> Set_AllElementsAttributes($this -> Element, $Name, implode($this -> ValuesSeparators_Global[$Name], $Value));
+							}
+							else
+							{
+								/*
+								 * default option for sticking of multiple values;
+								 * if character was not set for current attribute
+								 */
+								$this -> Set_AllElementsAttributes($this -> Element, $Name, implode(MarC::Show_Options_ValuesSeparation()[1], $Value));
+							}
+							
+						}
 					}
 				}
 				catch(MarC_Exception $Exception)
@@ -484,6 +518,47 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 				}
 			}
 		}
+	}
+	
+	/**
+	 * sets separator of values of attributes;
+	 * this function has to be in the front of functions for setting of attributes
+	 *
+	 * @param string $Attribute
+	 * @param string $Separator
+	 *
+	 * @throws MarC_Exception if attribute name was not set
+	 * @throws MarC_Exception if separator was not set
+	 *
+	 * @example Set_ValuesSeparator('class', ',');
+	 */
+	public function Set_ValuesSeparator($Attribute="", $Separator="")
+	{
+		try
+		{
+			if(empty($Attribute))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+		}
+		
+		try
+		{
+			if(empty($Separator))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+		}
+		
+		$this -> Set_AllValuesSeparators($Attribute, $Separator);
 	}
 	
 	/**
@@ -496,6 +571,11 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 *
 	 * @throws MarC_Exception if it was set and empty element was used
 	 * @throws MarC_Exception if it was not set as string, integer or double
+	 *
+	 * @example Set_Text();
+	 * @example Set_Text(1331);
+	 * @example Set_Text('example');
+	 * @example Set_Text($String);
 	 */
 	public function Set_Text($Text="")
 	{

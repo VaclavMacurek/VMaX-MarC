@@ -61,6 +61,8 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 * @throws MarC_Exception if top element was not set
 	 * @throws MarC_Exception if sub element was not set
 	 * @throws MarC_Exception if both elements were set the same
+	 *
+	 * @example new SimpleAssembler('tr', 'td');
 	 */
 	public function __construct($TopElement="", $SubElement="")
 	{
@@ -218,6 +220,8 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 *
 	 * @throws MarC_Exception if content item was set wrong
 	 * @throws MarC_Exception if content item was not as string, integer or double
+	 *
+	 * @example Set_Content('example');
 	 */
 	public function Set_Content($Item="")
 	{
@@ -288,6 +292,8 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 * @throws MarC_Exception if key and value were not set
 	 * @throws MarC_Exception if key and value should be used as text wrapped by element
 	 * @throws MarC_Exception if key or value should be used as value of any attribute and name of attribute was not set
+	 *
+	 * @example Set_ContentUsage('example', 'code', 'value');
 	 */
 	public function Set_ContentUsage($Key="", $Value="", $Attribute="")
 	{
@@ -440,6 +446,8 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 * @return void
 	 *
 	 * @throws MarC_Exception if style name was not set
+	 *
+	 * @example Set_TopLevelStyles('border-style', 'dashed')
 	 */
 	public function Set_TopLevelStyles($Name="", $Value="")
 	{
@@ -468,6 +476,8 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 *
 	 * @return void
 	 * @throws MarC_Exception if attribute name was not set
+	 *
+	 * @example Set_TopLevelAttributes('name', 'example')
 	 */
 	public function Set_TopLevelAttributes($Name="", $Value="")
 	{
@@ -501,6 +511,8 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 * @throws MarC_Exception if order was not set as integer
 	 * @throws MarC_Exception if order was not set greater than or equal to zero
 	 * @throws MarC_Exception if style name was not set
+	 *
+	 * @example Set_SubLevelStyles(1, 'border-style', 'dashed')
 	 */
 	public function Set_SubLevelStyles($Order="", $Name="", $Value="")
 	{
@@ -577,6 +589,8 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 * @throws MarC_Exception if order was not set as integer
 	 * @throws MarC_Exception if order was not set greater than or equal to zero
 	 * @throws MarC_Exception if attribute name was not set
+	 *
+	 * @example Set_SubLevelAttributes(0, 'onClick', 'example()')
 	 */
 	public function Set_SubLevelAttributes($Order="", $Name="", $Value="")
 	{
@@ -638,6 +652,86 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			$this -> Set_SelectedElementAttributes($Order, $this -> Elements['sub']['set'], $Name, $Value);
 			$this -> Set_OrderToList($Order);
 		}
+	}
+	
+	/**
+	 * sets separator of values of attributes of top level
+	 *
+	 * @param string $Attribute
+	 * @param string $Separator
+	 *
+	 * @throws MarC_Exception if attribute name was not set
+	 * @throws MarC_Exception if separator was not set
+	 *
+	 * @example Set_TopLevelValuesSeparator('class', ',');
+	 */
+	public function Set_TopLevelValuesSeparator($Attribute="", $Separator="")
+	{
+		try
+		{
+			if(empty($Attribute))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+		}
+	
+		try
+		{
+			if(empty($Separator))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+		}
+	
+		$this -> Set_SelectedValuesSeparators($this -> Elements['top']['main'], $Attribute, $Separator);
+	}
+	
+	/**
+	 * sets separator of values of attributes of top level
+	 *
+	 * @param string $Attribute
+	 * @param string $Separator
+	 *
+	 * @throws MarC_Exception if attribute name was not set
+	 * @throws MarC_Exception if separator was not set
+	 *
+	 * @example Set_SubLevelValuesSeparator('class', ',');
+	 */
+	public function Set_SubLevelValuesSeparator($Attribute="", $Separator="")
+	{
+		try
+		{
+			if(empty($Attribute))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+		}
+	
+		try
+		{
+			if(empty($Separator))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+		}
+	
+		$this -> Set_SelectedValuesSeparators($this -> Elements['sub']['main'], $Attribute, $Separator);
 	}
 	
 	/**
@@ -727,6 +821,18 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			
 			/*
 			 * part 2;
+			 * sets separator of attribute values
+			 */
+			if(isset($this -> ValuesSeparators_Selected[$this -> Elements['sub']['main']]))
+			{
+				foreach($this -> ValuesSeparators_Selected[$this -> Elements['sub']['main']] as $Attribute => $Separator)
+				{
+					$VMaX -> Set_ValuesSeparator($Attribute, $Separator);
+				}
+			}
+			
+			/*
+			 * part 3;
 			 * sets styles
 			 */
 			if(isset($this -> ElementStyles_Selected[$this -> Elements['sub']['set']][$Order]))
@@ -738,7 +844,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			}
 			
 			/*
-			 * part 3;
+			 * part 4;
 			 * sets attributes
 			 */
 			if(isset($this -> ElementAttributes_Selected[$this -> Elements['sub']['set']][$Order]))
@@ -750,7 +856,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			}
 			
 			/*
-			 * part 4;
+			 * part 5;
 			 * sets text wrapped by element of sub-level;
 			 * automatically detects empty elements
 			 */
@@ -760,7 +866,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			}
 			
 			/*
-			 * part 5 - if top-level element will not be used;
+			 * part 7 - if top-level element will not be used;
 			 * sets way how code will be exported;
 			 * sets styles for element of sub-level;
 			 */
@@ -778,7 +884,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 				}
 			}
 			/*
-			 * part 5 - if top-level element will not used;
+			 * part 7 - if top-level element will not used;
 			 * sets way how code will be exported;
 			 * sets styles for element of sub-level;
 			 */
@@ -812,6 +918,18 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			
 			/*
 			 * part 2;
+			 * sets separator of attribute values
+			 */
+			if(isset($this -> ValuesSeparators_Selected[$this -> Elements['top']['main']]))
+			{
+				foreach($this -> ValuesSeparators_Selected[$this -> Elements['top']['main']] as $Attribute => $Separator)
+				{
+					$VMaX -> Set_ValuesSeparator($Attribute, $Separator);
+				}
+			}
+			
+			/*
+			 * part 3;
 			 * sets styles
 			 */
 			if(isset($this -> ElementStyles_Selected[$this -> Elements['top']['set']][0]))
@@ -823,7 +941,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			}
 			
 			/*
-			 * part 3;
+			 * part 4;
 			 * sets attributes
 			 */
 			if(isset($this -> ElementAttributes_Selected[$this -> Elements['top']['set']][0]))
@@ -835,7 +953,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			}
 			
 			/*
-			 * part 4;
+			 * part 5;
 			 * sets text of sub-level code to being wrapped by element of top-level;
 			 * stores generated code into help variable - to it could be exported
 			 */

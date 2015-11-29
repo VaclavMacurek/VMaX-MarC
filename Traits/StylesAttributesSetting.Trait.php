@@ -45,6 +45,18 @@ trait StylesAttributesSetting
 	 */
 	protected $ElementAttributes_Selected = array();
 	/**
+	 * character used for separated of values in case of multi-values attributes without regard of element
+	 *
+	 * @var array
+	 */
+	protected $ValuesSeparators_Global = array();
+	/**
+	 * character used for separated of values in case of multi-values attributes with regard of element - but without regard of position of element
+	 *
+	 * @var array
+	 */
+	protected $ValuesSeparators_Selected = array();
+	/**
 	 * controls usage of attributes without values;
 	 * useful for JavaScript features
 	 *
@@ -61,6 +73,8 @@ trait StylesAttributesSetting
 	 *
 	 * @throws MarC_Exception if name of stylesheet was not set
 	 * @throws MarC_Exception if name of stylesheet does not match pattern of stylesheet name
+	 *
+	 * @example Check_StylesheetName('.example');
 	 */
 	protected function Check_StylesheetName($Name)
 	{
@@ -102,6 +116,8 @@ trait StylesAttributesSetting
 	 *
 	 * @throws MarC_Exception if style name was not set
 	 * @throws MarC_Exception if stylename does not match pattern of style name
+	 *
+	 * @example Check_StyleName('font-family');
 	 */
 	protected function Check_StyleName($Name)
 	{
@@ -143,6 +159,8 @@ trait StylesAttributesSetting
 	 *
 	 * @throws MarC_Exception if attribute name was not set
 	 * @throws MarC_Exception if attribute name does not match pattern of attribute name
+	 *
+	 * @example Check_AttributeName('id');
 	 */
 	protected function Check_AttributeName($Name)
 	{
@@ -216,6 +234,8 @@ trait StylesAttributesSetting
 	 *
 	 * @throws MarC_Exception if order (number index of appearance of used element in block) was not set
 	 * @throws MarC_Exception if order (number index of appearance of used element in block) was not set as integer
+	 *
+	 * @example Set_OrderToList(1);
 	 */
 	protected function Set_OrderToList($Order="")
 	{
@@ -264,6 +284,8 @@ trait StylesAttributesSetting
 	 *
 	 * @throws MarC_Exception if element name was not set
 	 * @throws MarC_Exception if style name was not set
+	 *
+	 * @example Set_AllElementsStyles('li', 'font-family', 'sans-serif');
 	 */
 	protected function Set_AllElementsStyles($Element, $Name, $Value="")
 	{
@@ -308,8 +330,11 @@ trait StylesAttributesSetting
 	 * @param string $Value
 	 *
 	 * @return void
+	 *
 	 * @throws MarC_Exception if element name was not set
 	 * @throws MarC_Exception if attribute name was not set
+	 *
+	 * @example Set_AllElementsAttributes('ul', 'id', 'example');
 	 */
 	protected function Set_AllElementsAttributes($Element, $Name, $Value="")
 	{
@@ -359,6 +384,8 @@ trait StylesAttributesSetting
 	 * @throws MarC_Exception if order (number index of appearance of used element in block) was not set
 	 * @throws MarC_Exception if element name was not set
 	 * @throws MarC_Exception if style name was not set
+	 *
+	 * @example Set_SelectedElementsStyles(0, 'li', 'color', '#FEDCBA');
 	 */
 	protected function Set_SelectedElementStyles($Order, $Element, $Name, $Value="")
 	{
@@ -445,6 +472,8 @@ trait StylesAttributesSetting
 	 * @throws MarC_Exception if order (number index of appearance of used element in block) was not set
 	 * @throws MarC_Exception if element name was not set
 	 * @throws MarC_Exception if attribute name was not set
+	 *
+	 * @example Set_SelectedElementsAttributes(0, 'div', 'id', 'example');
 	 */
 	protected function Set_SelectedElementAttributes($Order, $Element, $Name, $Value="")
 	{
@@ -526,8 +555,10 @@ trait StylesAttributesSetting
 	 *
 	 * @return string|void
 	 * @throws MarC_Exception if element name was not set
+	 *
+	 * @example Check_IsElementAvailable('video');
 	 */
-	protected function Check_ElementAvailable($Element)
+	protected function Check_IsElementAvailable($Element)
 	{
 		try
 		{
@@ -582,6 +613,125 @@ trait StylesAttributesSetting
 	public function Set_EnableNoValueAttributes()
 	{
 		self::$Enable_NoValueAttributes = TRUE;
+	}
+	
+	/**
+	 * sets characters used for separation of values for multivalue attributes;
+	 * has to be used before function Set_Attribute
+	 *
+	 * @param string $Attribute
+	 * @param string $Separator
+	 *
+	 * @return void
+	 *
+	 * @throws MarC_Exception if attribute was not set
+	 * @throws MarC_Exception if separator was set wrong
+	 *
+	 * @example Set_AllValuesSeparators('class', "\x20");
+	 */
+	protected function Set_AllValuesSeparators($Attribute="", $Separator=NULL)
+	{
+		try
+		{
+			if(empty($Attribute))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+		}
+	
+		try
+		{
+			if($Separator !== NULL && !in_array($Separator, MarC::Show_Options_ValuesSeparation()) )
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_DMDOPTION);
+			}
+			else
+			{
+				if($Separator !== NULL)
+				{
+					$this -> ValuesSeparators_Global[$Attribute] = $Separator;
+				}
+				else
+				{
+					$this -> ValuesSeparators_Global[$Attribute] = MarC::Show_Options_ValuesSeparation()[0];
+				}
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], MarC::Show_Options_ValuesSeparation());
+		}
+	}
+	
+	/**
+	 * sets characters used for separation of values for multivalue attributes;
+	 * has to be used before function Set_Attribute
+	 *
+	 * @param string $Element
+	 * @param string $Attribute
+	 * @param string $Separator
+	 *
+	 * @return void
+	 *
+	 * @throws MarC_Exception if element was not set
+	 * @throws MarC_Exception if attribute was not set
+	 * @throws MarC_Exception if separator was set wrong
+	 *
+	 * @example Set_SelectedValuesSeparators('div', 'class');
+	 * @example Set_SelectedValuesSeparators('div', 'class', "\x20");
+	 */
+	protected function Set_SelectedValuesSeparators($Element="", $Attribute="", $Separator=NULL)
+	{
+		try
+		{
+			if(empty($Element))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+		}
+		
+		try
+		{
+			if(empty($Attribute))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+		}
+	
+		try
+		{
+			if($Separator !== NULL && !in_array($Separator, MarC::Show_Options_ValuesSeparation()) )
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_DMDOPTION);
+			}
+			else
+			{
+				if($Separator !== NULL)
+				{
+					$this -> ValuesSeparators_Selected[$Element][$Attribute] = $Separator;
+				}
+				else
+				{
+					$this -> ValuesSeparators_Selected[$Element][$Attribute] = MarC::Show_Options_ValuesSeparation()[0];
+				}
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[2], MarC::Show_Options_ValuesSeparation());
+		}
 	}
 }
 
