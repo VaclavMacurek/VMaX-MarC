@@ -405,15 +405,21 @@ class UniqueAssembler extends ElementListSetting
 			{
 				if($Order < count($this -> Content)-1 )
 				{
-					$VMaX -> Set_ExportType(UniCAT::UNICAT_OPTION_GOON);
+					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_GOON);
 					$VMaX -> Execute();
 				}
 				else
 				{
-					$VMaX -> Set_ExportType(UniCAT::UNICAT_OPTION_STEP);
+					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
 					$this -> LocalCode = $VMaX -> Execute();
 
-					
+					/*
+					 * sets way how code will be exported;
+					 * exports code
+					 */
+					MarC::Set_ExportWay(static::$ExportWay);
+					MarC::Add_Comments($this -> LocalCode, static::$Comments);
+					return MarC::Convert_Code($this -> LocalCode, __CLASS__);
 				}
 			}
 			/*
@@ -432,14 +438,6 @@ class UniqueAssembler extends ElementListSetting
 				{
 					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
 					$this -> LocalCode = $VMaX -> Execute();
-
-					/*
-			 * sets way how code will be exported;
-			 * exports code
-			 */
-					MarC::Set_ExportWay(static::$ExportWay);
-					MarC::Add_Comments($this -> LocalCode, static::$Comments);
-					return MarC::Convert_Code($this -> LocalCode, __CLASS__);
 				}
 			}
 		}
