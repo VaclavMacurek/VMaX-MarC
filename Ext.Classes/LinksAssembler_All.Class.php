@@ -2,6 +2,8 @@
 
 namespace MarC;
 
+use UniCAT\UniCAT;
+
 /**
  * @package VMaX-MarC
  *
@@ -10,9 +12,9 @@ namespace MarC;
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
- * pre-set class for generation of simple list with elements ol > li
+ * pre-set class for generation of list of linked general stylesheets
  */
-final class RootAssembler_Html extends UniqueAssembler
+final class LinksAssembler_All extends SimpleAssembler
 {
 	/**
 	 * sets used elements
@@ -21,7 +23,10 @@ final class RootAssembler_Html extends UniqueAssembler
 	 */
 	public function __construct()
 	{
-		parent::__construct('html', array('head', 'body'));
+		parent::__construct('head', 'link');
+		$this -> Set_DisableTopLevel();
+		$this -> Set_Comment('general styles start', UniCAT::UNICAT_OPTION_ABOVE);
+		$this -> Set_Comment('general styles end', UniCAT::UNICAT_OPTION_BELOW);
 	}
 	
 	/**

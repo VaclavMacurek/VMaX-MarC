@@ -6,6 +6,7 @@ use UniCAT\CodeExport;
 use UniCAT\UniCAT;
 use UniCAT\Comments;
 
+
 /**
  * @package VMaX-MarC
  *
@@ -18,7 +19,7 @@ use UniCAT\Comments;
  */
 class SimpleAssembler extends ElementListSetting implements I_MarC_Options_ContentUsage
 {
-	use StylesAttributesSetting, CodeExport, Comments;
+	use ConditionalComments, StylesAttributesSetting, CodeExport, Comments;
 	
 	/**
 	 * list of orders - used to check if all stylea and attributes were set correctly
@@ -104,7 +105,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		
 		try
 		{
-			if(	!in_array(gettype($TopElement), array('array', 'string')) )
+			if(!in_array(gettype($TopElement), array('array', 'string')))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRMS, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_WRONGVALTYPE);
 			}
@@ -183,17 +184,23 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		 */
 		if(is_array($TopElement))
 		{
-			$this -> Elements['top']['main'] = $TopElement[0];
-			$this -> Elements['top']['set'] = $TopElement[1];
-			$this -> Elements['sub']['main'] = $SubElement[0];
-			$this -> Elements['sub']['set'] = $SubElement[1];
+			if($this -> Check_ElementTreeValidity($TopElement[0], $SubElement[0]))
+			{
+				$this -> Elements['top']['main'] = $TopElement[0];
+				$this -> Elements['top']['set'] = $TopElement[1];
+				$this -> Elements['sub']['main'] = $SubElement[0];
+				$this -> Elements['sub']['set'] = $SubElement[1];
+			}
 		}
 		else
 		{
-			$this -> Elements['top']['main'] = $TopElement;
-			$this -> Elements['top']['set'] = $TopElement;
-			$this -> Elements['sub']['main'] = $SubElement;
-			$this -> Elements['sub']['set'] = $SubElement;
+			if($this -> Check_ElementTreeValidity($TopElement, $SubElement))
+			{
+				$this -> Elements['top']['main'] = $TopElement;
+				$this -> Elements['top']['set'] = $TopElement;
+				$this -> Elements['sub']['main'] = $SubElement;
+				$this -> Elements['sub']['set'] = $SubElement;
+			}
 		}
 	}
 	
@@ -860,7 +867,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			 * sets text wrapped by element of sub-level;
 			 * automatically detects empty elements
 			 */
-			if(self::$List_AvailableElements[$this -> Elements['sub']['main']] != $this -> Elements['sub']['main'])
+			if(self::$List_AvailableElements[$this -> Elements['sub']['main']]['Siblings'] != 'EMPTY')
 			{
 				$VMaX -> Set_Text((empty($this -> Content[$Order]) ? '' : $this -> Content[$Order]));
 			}
@@ -879,12 +886,22 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 				}
 				else
 				{
-					$VMaX -> Set_ExportWay(static::$ExportWay);
-					return $VMaX -> Execute();
+					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
+					$this -> LocalCode = $VMaX -> Execute();
+
+					/*
+			 * sets way how code will be exported;
+			 * exports code
+			 */
+					MarC::Set_ExportWay(static::$ExportWay);
+					MarC::Add_ConditionalComment($this -> LocalCode, static::$ConditionalComments);
+					MarC::Add_Comments($this -> LocalCode, static::$Comments);
+					static::$ConditionalComments = FALSE;
+					return MarC::Convert_Code($this -> LocalCode, __CLASS__);
 				}
 			}
 			/*
-			 * part 7 - if top-level element will not used;
+			 * part 7 - if top-level element will be used;
 			 * sets way how code will be exported;
 			 * sets styles for element of sub-level;
 			 */
@@ -965,7 +982,9 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			 * exports code
 			 */
 			MarC::Set_ExportWay(static::$ExportWay);
+			MarC::Add_ConditionalComment($this -> LocalCode, static::$ConditionalComments);
 			MarC::Add_Comments($this -> LocalCode, static::$Comments);
+			static::$ConditionalComments = FALSE;
 			return MarC::Convert_Code($this -> LocalCode, __CLASS__);
 		}
 	}

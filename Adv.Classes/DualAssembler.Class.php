@@ -165,12 +165,15 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], $SubElement1);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], $SubElement);
 		}
-		
-		$this -> Elements['top'] = $TopElement;
-		$this -> Elements['mid'] = $MidElement;
-		$this -> Elements['sub'] = $SubElement;
+
+		if($this -> Check_ElementTreeValidity($TopElement, $MidElement, $SubElement))
+		{
+			$this -> Elements['top'] = $TopElement;
+			$this -> Elements['mid'] = $MidElement;
+			$this -> Elements['sub'] = $SubElement;
+		}
 	}
 	
 	/**

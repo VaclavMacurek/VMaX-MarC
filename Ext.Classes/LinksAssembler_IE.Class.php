@@ -2,6 +2,8 @@
 
 namespace MarC;
 
+use UniCAT\UniCAT;
+
 /**
  * @package VMaX-MarC
  *
@@ -10,9 +12,9 @@ namespace MarC;
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
- * pre-set class for generation of simple list with elements ol > li
+ * pre-set class for generation of list of linked IE-related stylesheets
  */
-final class RootAssembler_Html extends UniqueAssembler
+final class LinksAssembler_IE extends SimpleAssembler
 {
 	/**
 	 * sets used elements
@@ -21,7 +23,13 @@ final class RootAssembler_Html extends UniqueAssembler
 	 */
 	public function __construct()
 	{
-		parent::__construct('html', array('head', 'body'));
+		parent::__construct('head', 'link');
+		$this -> Set_DisableTopLevel();
+		$this -> Set_Comment('IE conditional styles start', UniCAT::UNICAT_OPTION_ABOVE);
+		$this -> Set_Comment('IE conditional styles end', UniCAT::UNICAT_OPTION_BELOW);
+		$this -> Set_ConditionalComment(MarC::MARC_CODE_CONDCOMMENT_IE);
+
+		
 	}
 	
 	/**

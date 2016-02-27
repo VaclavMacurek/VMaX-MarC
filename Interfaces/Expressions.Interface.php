@@ -16,9 +16,28 @@ namespace MarC;
  */
 interface I_MarC_Expressions_ElementListSetting
 {
-	const MARC_PATTERN_DEFINITION_ANYELEMENT = '/<!ELEMENT/';
-	const MARC_PATTERN_DEFINITION_EMPTYELEMENT = '/<!ELEMENT (.*) EMPTY>/i';
-	const MARC_PATTERN_DEFINITION_ENTITY = '/%(.*)\;/i';
+	/**
+	 * pattern for identification of element definition in DTD file
+	 */
+	const MARC_PATTERN_DEFINITION_ELEMENT_NAMECONTENT = '/\<\!ELEMENT (?<ElementName>[^\>\x20]*)[[:space:]]+(?<ElementSetting>[^\>]*)\>/s';
+	/**
+	 * pattern for identification of element's siblings in DTD file
+	 */
+	const MARC_PATTERN_DEFINITION_ELEMENT_CONTENT = '/(?<Element>\#{0,1}[[:alnum:]]{1,}\:{0,1}[[:alnum:]]{0,})/';
+	/**
+	 * pattern for identification of entity definition in DTD file;
+	 * this is one possible way how to extract all entities;
+	 * complexive expression would not exctract some entities
+	 */
+	const MARC_PATTERN_DEFINITION_ENTITY_BLOCK = '/<!ENTITY ([^\>]+)>/s';
+	/**
+	 * pattern for extraction of name and content of entities
+	 */
+	const MARC_PATTERN_DEFINITION_ENTITY_NAMECONTENT = '/\%[[:space:]]+(?<EntityName>.+)[[:space:]]+"(?<EntitySetting>.+)"/';
+	/**
+	 * pattern for identification of entities used in definition of elements and else entities
+	 */
+	const MARC_PATTERN_DEFINITION_ENTITY_USED = '/(?<Entities>%[a-zA-Z0-9]{1,}\.{0,1}[a-zA-Z0-9]{0,};)/';
 }
 
 /**
@@ -34,14 +53,6 @@ interface I_MarC_Expressions_Elements
 	 * pattern for closing form of element name
 	 */
 	const MARC_PATTERN_NAME_ELEMENT_CLOSE = '/^\/{1}[a-zA-Z0-9]{1,}\:{0,1}[a-zA-Z0-9]{0,}$/i';
-	/**
-	 * pattern for opening form of IE condition
-	 */
-	const MARC_PATTERN_NAME_IECONDITION_OPEN = '/^!--\[if (.*)\]$/i';
-	/**
-	 * pattern for closing form of IE condition
-	 */
-	const MARC_PATTERN_NAME_IECONDITION_CLOSE = '/^!\[endif\]--$/i';
 }
 
 /**
@@ -52,11 +63,11 @@ interface I_MarC_Expressions_StylesAttributesSetting
 	/**
 	 * pattern for identifying of correct form of stylesheet name
 	 */
-	const MARC_PATTERN_STYLESHEETNAME = '/^[^0-9\_\-][^\-][a-zA-Z0-9\_][^\_\-]/i';
+	const MARC_PATTERN_STYLESHEETNAME = '/^[^0-9\_\-][^\-][a-zA-Z0-9\_][^\_\-]/';
 	/**
 	 * pattern for identifying of correct form of attribute name
 	 */
-	const MARC_PATTERN_ATTRIBUTENAME = '/^[^\-][a-zA-Z\-]/i';
+	const MARC_PATTERN_ATTRIBUTENAME = '/^[^\-][a-zA-Z\-]/';
 	/**
 	 * pattern for identifying of correct form of style name
 	 */
@@ -64,9 +75,11 @@ interface I_MarC_Expressions_StylesAttributesSetting
 }
 
 /**
- * union interface of chosen expressions
+ * union interface of chosen expressions;
+ * other set of expressions is only for inner
  */
-interface I_MarC_Expressions_Union extends I_MarC_Expressions_Elements, I_MarC_Expressions_StylesAttributesSetting
+interface I_MarC_Expressions_Union extends 	I_MarC_Expressions_Elements,
+									I_MarC_Expressions_StylesAttributesSetting
 {
 }
 

@@ -87,7 +87,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> Exception_SimpleWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -103,7 +103,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> Exception_SimpleWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), self::MARC_PATTERN_STYLESHEETNAME);
+			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), self::MARC_PATTERN_STYLESHEETNAME);
 		}
 	}
 	
@@ -130,7 +130,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> Exception_SimpleWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -173,7 +173,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> Exception_SimpleWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -548,12 +548,12 @@ trait StylesAttributesSetting
 	}
 	
 	/**
-	 * get element's name as is in element list;
-	 * checks if element is in list of usable elements
+	 * checks if element is in list of elements for using;
+	 * 
 	 *
 	 * @param string $Element
 	 *
-	 * @return string|void
+	 * @return string elemenr name matching its item in array of elements available for usage
 	 * @throws MarC_Exception if element name was not set
 	 *
 	 * @example Check_IsElementAvailable('video');

@@ -28,6 +28,8 @@ final class DTDLine extends ElementListSetting
 	 *
 	 * @throws MarC_Exception if file was not set
 	 * @throws MarC_Exception if file was not found
+	 *
+	 * @example new DTDLine('example.html');
 	 */
 	public function __construct($File="")
 	{

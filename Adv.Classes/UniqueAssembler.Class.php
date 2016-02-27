@@ -2,7 +2,6 @@
 
 namespace MarC;
 
-use UniCAT\MethodScope;
 use UniCAT\CodeExport;
 use UniCAT\UniCAT;
 use UniCAT\Comments;
@@ -19,7 +18,7 @@ use UniCAT\Comments;
  */
 class UniqueAssembler extends ElementListSetting
 {
-	use StylesAttributesSetting, CodeExport, Comments;
+	use ConditionalComments, StylesAttributesSetting, CodeExport, Comments;
 	
 	/**
 	 * list of orders - used to check if all styles and attributes were set correctly
@@ -141,9 +140,12 @@ class UniqueAssembler extends ElementListSetting
 		{
 			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
-		
-		$this -> Elements['top'] = $TopElement;
-		$this -> Elements['sub'] = $SubElements;
+
+		if($this -> Check_ElementTreeValidity($TopElement, $SubElements))
+		{
+			$this -> Elements['top'] = $TopElement;
+			$this -> Elements['sub'] = $SubElements;
+		}
 	}
 	
 	/**
@@ -389,7 +391,7 @@ class UniqueAssembler extends ElementListSetting
 			 * sets text wrapped by element of sub-level;
 			 * automatically detects empty elements
 			 */
-			if(self::$List_AvailableElements[$this -> Elements['sub'][$Order]] != $this -> Elements['sub'][$Order])
+			if(self::$List_AvailableElements[$this -> Elements['sub'][$Order]]['Siblings'] != 'EMPTY')
 			{
 				$VMaX -> Set_Text((empty($this -> Content[$Order]) ? '' : $this -> Content[$Order] ));
 			}
@@ -408,8 +410,10 @@ class UniqueAssembler extends ElementListSetting
 				}
 				else
 				{
-					$VMaX -> Set_ExportType(static::$ExportWay);
-					return $VMaX -> Execute();
+					$VMaX -> Set_ExportType(UniCAT::UNICAT_OPTION_STEP);
+					$this -> LocalCode = $VMaX -> Execute();
+
+					
 				}
 			}
 			/*
@@ -428,6 +432,14 @@ class UniqueAssembler extends ElementListSetting
 				{
 					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
 					$this -> LocalCode = $VMaX -> Execute();
+
+					/*
+			 * sets way how code will be exported;
+			 * exports code
+			 */
+					MarC::Set_ExportWay(static::$ExportWay);
+					MarC::Add_Comments($this -> LocalCode, static::$Comments);
+					return MarC::Convert_Code($this -> LocalCode, __CLASS__);
 				}
 			}
 		}
