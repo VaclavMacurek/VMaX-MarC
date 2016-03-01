@@ -3,15 +3,15 @@
 namespace MarC;
 
 use UniCAT\CodeExport;
-use UniCAT\UniCAT;
 use UniCAT\Comments;
-
+use UniCAT\UniCAT;
+use UniCAT\MethodScope;
 
 /**
  * @package VMaX-MarC
  *
  * @author Václav Macůrek <VaclavMacurek@seznam.cz>
- * @copyright 2014 - 2015 Václav Macůrek
+ * @copyright 2014 - 2016 Václav Macůrek
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
@@ -67,6 +67,11 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 */
 	public function __construct($TopElement="", $SubElement="")
 	{
+		/*
+		 * disables multiple new lines and shortens code in that way
+		 */
+		MarC::Set_DisableMultipleNewLines();
+
 		try
 		{
 			if(empty($TopElement))
@@ -76,7 +81,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -88,7 +93,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		try
@@ -100,7 +105,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), array('string', 'array'));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), array('string', 'array'));
 		}
 		
 		try
@@ -112,7 +117,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($SubElement), array('string', 'array'));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($SubElement), array('string', 'array'));
 		}
 		
 		try
@@ -124,7 +129,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -136,7 +141,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], 2);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 2);
 		}
 		
 		try
@@ -148,7 +153,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], 2);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], 2);
 		}
 		
 		try
@@ -160,7 +165,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -172,7 +177,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		/*
@@ -243,7 +248,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), 2);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), 2);
 		}
 		
 		try
@@ -255,7 +260,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), gettype($Item[0]), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Item[0]), MarC::Show_Options_Scalars());
 		}
 		
 		try
@@ -267,7 +272,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), (in_array(gettype($Item[0]), MarC::Show_Options_Scalars()) ? gettype($Item[1]) : gettype($Item[0])), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), (in_array(gettype($Item[0]), MarC::Show_Options_Scalars()) ? gettype($Item[1]) : gettype($Item[0])), MarC::Show_Options_Scalars());
 		}
 		
 		/*
@@ -320,7 +325,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -332,7 +337,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		try
@@ -344,7 +349,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Key), 'string');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Key), 'string');
 		}
 		
 		try
@@ -356,7 +361,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($Value), 'string');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($Value), 'string');
 		}
 		
 		try
@@ -368,7 +373,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], MarC::Show_Options_SimpleAssembler());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], MarC::Show_Options_SimpleAssembler());
 		}
 		
 		try
@@ -380,7 +385,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], MarC::Show_Options_SimpleAssembler());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], MarC::Show_Options_SimpleAssembler());
 		}
 		
 		try
@@ -393,7 +398,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[2]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[2]);
 		}
 		
 		try
@@ -405,7 +410,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[2], 2);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[2], 2);
 		}
 		
 		try
@@ -417,7 +422,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		/*
@@ -471,7 +476,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch (MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	}
 	
@@ -501,7 +506,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch (MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	}
 	
@@ -532,7 +537,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		try
@@ -544,7 +549,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
 		}
 	
 		try
@@ -556,7 +561,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
 		}
 	
 		try
@@ -568,7 +573,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 	
 		/*
@@ -610,7 +615,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		try
@@ -622,7 +627,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
 		}
 	
 		try
@@ -634,7 +639,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
 		}
 	
 		try
@@ -646,7 +651,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 	
 		/*
@@ -683,7 +688,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		try
@@ -695,7 +700,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 	
 		$this -> Set_SelectedValuesSeparators($this -> Elements['top']['main'], $Attribute, $Separator);
@@ -723,7 +728,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		try
@@ -735,7 +740,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 	
 		$this -> Set_SelectedValuesSeparators($this -> Elements['sub']['main'], $Attribute, $Separator);

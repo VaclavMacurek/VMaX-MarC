@@ -2,15 +2,15 @@
 
 namespace MarC;
 
-use UniCAT\BasicOptions;
 use UniCAT\ErrorOptions;
 use UniCAT\UniCAT;
+use UniCAT\MethodScope;
 
 /**
  * @package VMaX-MarC
  *
  * @author Václav Macůrek <VaclavMacurek@seznam.cz>
- * @copyright 2014 - 2015 Václav Macůrek
+ * @copyright 2014 - 2016 Václav Macůrek
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
@@ -18,7 +18,7 @@ use UniCAT\UniCAT;
  */
 class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 {
-	use BasicOptions, ErrorOptions;
+	use ErrorOptions;
 	
 	/**
 	 * list of elements got from DTD file;
@@ -89,7 +89,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		}
 		catch (MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], MarC::Show_Options_Booleans());
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], MarC::Show_Options_Booleans());
 		}
 		
 		self::$List_AvailableElements = ($ResetList === TRUE) ? array() : self::$List_AvailableElements;
@@ -106,7 +106,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -118,7 +118,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		}
 		catch (MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], 'file '.$File);
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 'file '.$File);
 		}
 		
 		$this -> Get_ElementList($File);
@@ -151,7 +151,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -163,7 +163,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -175,7 +175,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], MarC::MARC_PATTERN_NAME_ELEMENT_OPEN);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], MarC::MARC_PATTERN_NAME_ELEMENT_OPEN);
 		}
 		
 		try
@@ -187,7 +187,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], array(MarC::MARC_PATTERN_NAME_ELEMENT_OPEN, MarC::MARC_PATTERN_NAME_ELEMENT_CLOSE, MarC::MARC_PATTERN_NAME_IECONDITION_CLOSE));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], array(MarC::MARC_PATTERN_NAME_ELEMENT_OPEN, MarC::MARC_PATTERN_NAME_ELEMENT_CLOSE, MarC::MARC_PATTERN_NAME_IECONDITION_CLOSE));
 		}
 		
 		try
@@ -199,7 +199,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[2], gettype($Siblings), array('array', 'string') );
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[2], gettype($Siblings), array('array', 'string') );
 		}
 		
 		try
@@ -211,7 +211,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[2], MarC::Show_Options_ElementSetting());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[2], MarC::Show_Options_ElementSetting());
 		}
 		
 		switch($Siblings)
@@ -260,7 +260,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -288,7 +288,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), $Elements[0]);
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), $Elements[0]);
 		}
 		
 		try
@@ -340,11 +340,11 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		{
 			if($Error == 1)
 			{
-				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[$Index], $Elements[$Index]);
+				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[$Index], $Elements[$Index]);
 			}
 			elseif($Error == 4)
 			{
-				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[$Index], self::$List_AvailableElements[$Elements[$Index]]['Siblings']);
+				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[$Index], self::$List_AvailableElements[$Elements[$Index]]['Siblings']);
 			}
 		}
 	}
@@ -489,7 +489,6 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		
 		$Entities = $Entities_Final;
 	}
-	
 	
 }
 

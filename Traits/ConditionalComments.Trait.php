@@ -3,12 +3,13 @@
 namespace MarC;
 
 use UniCAT\ClassScope;
+use UniCAT\MethodScope;
 
 /**
  * @package VMaX-UniCAT
  *
  * @author Václav Macůrek <VaclavMacurek@seznam.cz>
- * @copyright 2014 - 2015 Václav Macůrek
+ * @copyright 2014 - 2016 Václav Macůrek
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
@@ -49,25 +50,19 @@ trait ConditionalComments
 		}
 		catch(UniCAT_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
-	
-		/*
-		 * prepares interface with correct comments (more or less related to class)
-		 */
-		$Scope = new ClassScope('MarC\I_MarC_Texts_ConditionalComments');
-		$Constructions = $Scope -> getConstants();
 		
 		try
 		{
-			if(!in_array($Comment, array_values($Constructions)))
+			if(!in_array($Comment, ClassScope::Get_ConstantsValues('MarC\I_MarC_Texts_ConditionalComments')))
 			{
 				throw new UniCAT_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch(UniCAT_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], array_keys($Constructions));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], ClassScope::Get_ConstantsNames('MarC\I_MarC_Texts_ConditionalComments'));
 		}
 	
 		static::$ConditionalComments = $Comment;

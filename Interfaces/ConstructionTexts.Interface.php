@@ -6,7 +6,7 @@ namespace MarC;
  * @package VMaX-MarC
  *
  * @author Václav Macůrek <VaclavMacurek@seznam.cz>
- * @copyright 2014 - 2015 Václav Macůrek
+ * @copyright 2014 - 2016 Václav Macůrek
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
@@ -167,6 +167,30 @@ interface I_MarC_Texts_ConditionalComments
 	 * order of %s: comment text
 	 */
 	const MARC_CODE_CONDCOMMENT_GTEIE11 = "\n<!--[if gte IE 11]>\n\t%s\n\t\n<![endif]-->\n";
+}
+
+interface I_MarC_Texts_CodeHeading
+{
+	/**
+	 * without posibility to add any text;
+	 * XHTML1 Strict
+	 */
+	const MARC_CODE_XHTML1STRICT = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
+	/**
+	 * without posibility to add any text;
+	 * XHTML1 Transitional
+	 */
+	const MARC_CODE_XHTML1TRANS = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/xhtml1-transitional.dtd">';
+	/**
+	 * without posibility to add any text;
+	 * XHTML1 Frameset
+	 */
+	const MARC_CODE_XHTML1FRAME = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">';
+	/**
+	 * without posibility to add any text;
+	 * XML
+	 */
+	const MARC_CODE_XML = '<?xml version="1.0" encoding="UTF-8" ?>';
 }
 
 ?>

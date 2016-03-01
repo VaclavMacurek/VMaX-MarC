@@ -3,8 +3,9 @@
 namespace MarC;
 
 use UniCAT\CodeExport;
-use UniCAT\UniCAT;
 use UniCAT\Comments;
+use UniCAT\UniCAT;
+use UniCAT\MethodScope;
 
 /**
  * @package VMaX-MarC
@@ -104,34 +105,30 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 	}
 	
 	/**
-	 * prevents sharing of content given to variable written into
+	 * empties member variables that are not static
 	 */
 	public function __destruct()
 	{
-	}
-
-	/**
-	 * enables creation of one-line element
-	 *
-	 * @return void
-	 *
-	 * @throws nothing
-	 */
-	public function Set_EnableOneLineElement()
-	{
-		$this -> Enable_OneLineElement = TRUE;
+		$this -> Element = FALSE;
+		$this -> Text = array();
+		$this -> Enable_OneLineElement = FALSE;
+		$this -> Enable_InLineElement = FALSE;
 	}
 
 	/**
 	 * enables creation of in-line element;
-	 * allows insertion of text also to 
+	 * allows insertion of text also to empty element
+	 *
+	 * @param string $Position position of text added to element represented by constant
+	 *
+	 * @throws MarC_Exception if position was set by unsupported wrong
 	 */
-	public function Set_EnableInLineElement($Position="")
+	public function Set_EnableInLineElement($Position=MARC_CODE_)
 	{
 		try
 		{
@@ -142,10 +139,20 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], UniCAT::Show_Options_CommentPosition());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], UniCAT::Show_Options_CommentPosition());
 		}
 
 		$this -> Enable_InLineElement = $Position;
+	}
+
+	/**
+	 * enables creation of one-line element
+	 *
+	 * @return void
+	 */
+	public function Set_EnableOneLineElement()
+	{
+		$this -> Enable_OneLineElement = TRUE;
 	}
 	
 	/**
@@ -197,15 +204,13 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 			 * empty value has the same effect as non-set value
 			 */
 			case 1:
-				$Element = $this -> Check_IsElementAvailable($Elements[0]);
-				
 				if(empty($Element))
 				{
 					$this -> Set_DisableIndention();
 				}
 				else
 				{
-					if($this -> Check_ElementName($Element))
+					if($this -> Check_ElementTreeValidity($Element))
 					{
 						if(is_array(self::$Disable_Indention) )
 						{
@@ -441,7 +446,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -453,7 +458,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), 4);
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), 4);
 		}
 		
 		/*
@@ -541,7 +546,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		if($this -> Check_StyleName($Name))
@@ -576,7 +581,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		/*
@@ -592,7 +597,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], 'Set_EnableNoValueAttributes');
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], 'Set_EnableNoValueAttributes');
 		}
 		
 		if($this -> Check_AttributeName($Name))
@@ -639,7 +644,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 				}
 				catch(MarC_Exception $Exception)
 				{
-					$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($Value), MarC::Show_Options_Scalars());
+					$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($Value), MarC::Show_Options_Scalars());
 				}
 			}
 		}
@@ -668,7 +673,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -680,7 +685,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		$this -> Set_AllValuesSeparators($Attribute, $Separator);
@@ -725,7 +730,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), gettype($Text), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Text), MarC::Show_Options_Scalars());
 		}
 		
 		$this -> Text[] = $Text;

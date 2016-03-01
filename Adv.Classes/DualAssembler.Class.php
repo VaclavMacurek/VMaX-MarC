@@ -3,14 +3,15 @@
 namespace MarC;
 
 use UniCAT\CodeExport;
-use UniCAT\UniCAT;
 use UniCAT\Comments;
+use UniCAT\UniCAT;
+use UniCAT\MethodScope;
 
 /**
  * @package VMaX-MarC
  *
  * @author Václav Macůrek <VaclavMacurek@seznam.cz>
- * @copyright 2014 - 2015 Václav Macůrek
+ * @copyright 2014 - 2016 Václav Macůrek
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
@@ -72,6 +73,11 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 */
 	public function __construct($TopElement="", $MidElement="", $SubElement="")
 	{
+		/*
+		 * disables multiple new lines and shortens code in that way
+		 */
+		MarC::Set_DisableMultipleNewLines();
+
 		try
 		{
 			if(empty($TopElement))
@@ -81,7 +87,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -93,7 +99,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -105,7 +111,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -117,7 +123,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
 		}
 		
 		try
@@ -129,7 +135,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
 		}
 		
 		try
@@ -141,7 +147,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
 		}
 		
 		try
@@ -153,7 +159,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], $TopElement);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], $TopElement);
 		}
 		
 		try
@@ -165,7 +171,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], $SubElement);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], $SubElement);
 		}
 
 		if($this -> Check_ElementTreeValidity($TopElement, $MidElement, $SubElement))
@@ -210,7 +216,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -222,7 +228,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), gettype($Value), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Value), MarC::Show_Options_Scalars());
 		}
 		
 		$this -> DefaultOption = $Value;
@@ -261,7 +267,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), gettype($Content), 'array');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Content), 'array');
 		}
 		
 		/*
@@ -299,7 +305,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, "Set_FormContent");
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, "Set_FormContent");
 		}
 		
 		try
@@ -311,7 +317,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -323,7 +329,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		try
@@ -335,7 +341,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Name), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Name), MarC::Show_Options_Scalars());
 		}
 		
 		try
@@ -347,7 +353,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($Value), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($Value), MarC::Show_Options_Scalars());
 		}
 		
 		/*
@@ -395,7 +401,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -407,7 +413,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
 		}
 		
 		try
@@ -419,7 +425,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
 		}
 		
 		try
@@ -431,7 +437,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		$this -> Set_SelectedElementStyles($Order, $this -> Elements['sub'], $Name, $Value);
@@ -464,7 +470,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		try
@@ -476,7 +482,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
 		}
 	
 		try
@@ -488,7 +494,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
 		}
 	
 		try
@@ -500,7 +506,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 	
 		$this -> Set_SelectedElementAttributes($Order, $this -> Elements['sub'], $Name, $Value);
@@ -533,7 +539,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		try
@@ -545,7 +551,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
 		}
 	
 		try
@@ -557,7 +563,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
 		}
 	
 		try
@@ -569,7 +575,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 	
 		$this -> Set_SelectedElementStyles($Order, $this -> Elements['mid'], $Name, $Value);
@@ -602,7 +608,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		try
@@ -614,7 +620,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
 		}
 	
 		try
@@ -626,7 +632,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
 		}
 	
 		try
@@ -638,7 +644,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 	
 		$this -> Set_SelectedElementAttributes($Order, $this -> Elements['mid'], $Name, $Value);
@@ -667,7 +673,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		$this -> Set_AllElementsStyles($this -> Elements['top'], $Name, $Value);
@@ -696,7 +702,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		$this -> Set_AllElementsAttributes($this -> Elements['top'], $Name, $Value);
@@ -724,7 +730,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		$this -> SpecialAttributes['sub'] = $Attribute;
@@ -750,7 +756,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		$this -> SpecialAttributes['mid'] = $Attribute;
@@ -776,7 +782,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 	
 		$this -> SpecialAttributes['chc'] = $Attribute;
@@ -804,7 +810,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -816,7 +822,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		$this -> Set_SelectedValuesSeparators($this -> Elements['top'], $Attribute, $Separator);
@@ -844,7 +850,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		try
@@ -856,7 +862,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 	
 		$this -> Set_SelectedValuesSeparators($this -> Elements['mid'], $Attribute, $Separator);
@@ -884,7 +890,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		try
@@ -896,7 +902,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 	
 		$this -> Set_SelectedValuesSeparators($this -> Elements['sub'], $Attribute, $Separator);
@@ -933,7 +939,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -945,7 +951,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		try
@@ -957,7 +963,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Content), 'array');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Content), 'array');
 		}
 		
 		/*

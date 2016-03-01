@@ -3,12 +3,13 @@
 namespace MarC;
 
 use UniCAT\UniCAT;
+use UniCAT\MethodScope;
 
 /**
  * @package VMaX-MarC
  *
  * @author Václav Macůrek <VaclavMacurek@seznam.cz>
- * @copyright 2014 - 2015 Václav Macůrek
+ * @copyright 2014 - 2016 Václav Macůrek
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
@@ -65,49 +66,6 @@ trait StylesAttributesSetting
 	protected static $Enable_NoValueAttributes = FALSE;
 	
 	/**
-	 * checks if name of style sheet is correct
-	 *
-	 * @param string $Name
-	 *
-	 * @return boolean
-	 *
-	 * @throws MarC_Exception if name of stylesheet was not set
-	 * @throws MarC_Exception if name of stylesheet does not match pattern of stylesheet name
-	 *
-	 * @example Check_StylesheetName('.example');
-	 */
-	protected function Check_StylesheetName($Name)
-	{
-		try
-		{
-			if(empty($Name))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
-		}
-		
-		try
-		{
-			if(preg_match(self::MARC_PATTERN_STYLESHEETNAME, $Name))
-			{
-				return TRUE;
-			}
-			else
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_WRONGREGEX);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), self::MARC_PATTERN_STYLESHEETNAME);
-		}
-	}
-	
-	/**
 	 * checks if name of style is correct
 	 *
 	 * @param string $Name
@@ -130,7 +88,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -146,7 +104,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), $Name, MarC::MARC_PATTERN_STYLENAME);
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), $Name, MarC::MARC_PATTERN_STYLENAME);
 		}
 	}
 	
@@ -173,7 +131,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -189,7 +147,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), $Name, MarC::MARC_PATTERN_ATTRIBUTENAME);
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), $Name, MarC::MARC_PATTERN_ATTRIBUTENAME);
 		}
 	}
 	
@@ -223,7 +181,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_VariableNameAsText($this -> List_UsedOrders), count($this -> Content));
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), $Exception -> Get_VariableNameAsText($this -> List_UsedOrders), count($this -> Content));
 		}
 	}
 	
@@ -248,7 +206,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 	
 		try
@@ -260,7 +218,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Order), 'integer');
 		}
 	
 		/*
@@ -298,7 +256,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -310,7 +268,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		/*
@@ -347,7 +305,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -359,7 +317,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		/*
@@ -398,7 +356,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -410,7 +368,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
 		}
 		
 		try
@@ -422,7 +380,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
 		}
 		
 		try
@@ -434,7 +392,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		try
@@ -446,7 +404,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[2]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[2]);
 		}
 		
 		/*
@@ -486,7 +444,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -498,7 +456,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
 		}
 		
 		try
@@ -510,7 +468,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
 		}
 		
 		try
@@ -522,7 +480,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		try
@@ -534,7 +492,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[2]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[2]);
 		}
 		
 		/*
@@ -545,64 +503,6 @@ trait StylesAttributesSetting
 		 * Value - attribute value
 		 */
 		$this -> ElementAttributes_Selected[$Element][$Order][$Name] = $Value;
-	}
-	
-	/**
-	 * checks if element is in list of elements for using;
-	 * 
-	 *
-	 * @param string $Element
-	 *
-	 * @return string elemenr name matching its item in array of elements available for usage
-	 * @throws MarC_Exception if element name was not set
-	 *
-	 * @example Check_IsElementAvailable('video');
-	 */
-	protected function Check_IsElementAvailable($Element)
-	{
-		try
-		{
-			if(empty($Element))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_VAR, UniCAT::UNICAT_EXCEPTIONS_SEC_VAR_PRHBSTMT);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_VariableNameAsText(self::$List_AvailableElements), 'empty');
-		}
-		
-		/*
-		 * searches for element in list of available elements - in lowercase, uppercase and original;
-		 * element names has to be equal
-		 */
-		$Lowercase = array_key_exists(strtolower($Element), self::$List_AvailableElements) ? strtolower($Element) : (array_search(strtolower($Element), self::$List_AvailableElements) ? strtolower($Element) : FALSE );
-		$Uppercase = array_key_exists(strtoupper($Element), self::$List_AvailableElements) ? strtoupper($Element) : (array_search(strtoupper($Element), self::$List_AvailableElements) ? strtoupper($Element) : FALSE );
-		$Usercase = array_key_exists($Element, self::$List_AvailableElements) ? $Element : (array_search($Element, self::$List_AvailableElements) ? $Element : FALSE );
-		
-		try
-		{
-			if($Lowercase != FALSE)
-			{
-				return $Lowercase;
-			}
-			elseif($Uppercase != FALSE)
-			{
-				return $Uppercase;
-			}
-			elseif($Usercase != FALSE)
-			{
-				return $Usercase;
-			}
-			else
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_PRHBOPTION);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), $Exception -> Get_CallerFunctionName(), $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), $Element);
-		}
 	}
 	
 	/**
@@ -640,7 +540,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 	
 		try
@@ -663,7 +563,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1], MarC::Show_Options_ValuesSeparation());
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], MarC::Show_Options_ValuesSeparation());
 		}
 	}
 	
@@ -695,7 +595,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		try
@@ -707,7 +607,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 	
 		try
@@ -730,7 +630,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[2], MarC::Show_Options_ValuesSeparation());
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[2], MarC::Show_Options_ValuesSeparation());
 		}
 	}
 }

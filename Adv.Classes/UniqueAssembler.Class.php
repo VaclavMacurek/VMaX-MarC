@@ -3,8 +3,9 @@
 namespace MarC;
 
 use UniCAT\CodeExport;
-use UniCAT\UniCAT;
 use UniCAT\Comments;
+use UniCAT\UniCAT;
+use UniCAT\MethodScope;
 
 /**
  * @package VMaX-MarC
@@ -69,6 +70,11 @@ class UniqueAssembler extends ElementListSetting
 	 */
 	public function __construct($TopElement="", $SubElements="")
 	{
+		/*
+		 * disables multiple new lines and shortens code in that way
+		 */
+		MarC::Set_DisableMultipleNewLines();
+
 		try
 		{
 			if(empty($TopElement))
@@ -78,7 +84,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -90,7 +96,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 		
 		try
@@ -102,7 +108,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
 		}
 		
 		try
@@ -114,7 +120,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($SubElements), 'array');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($SubElements), 'array');
 		}
 		
 		try
@@ -126,7 +132,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
 		}
 		
 		try
@@ -138,7 +144,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
 		}
 
 		if($this -> Check_ElementTreeValidity($TopElement, $SubElements))
@@ -198,7 +204,7 @@ class UniqueAssembler extends ElementListSetting
 					catch(MarC_Exception $Exception)
 					{
 						array_unshift($this -> Elements['sub'], $this -> Elements['top']);
-						$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], $this -> Elements['sub']);
+						$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], $this -> Elements['sub']);
 					}
 					
 					if($Parts['Order'] == 'ValuesSeparator')
@@ -217,7 +223,7 @@ class UniqueAssembler extends ElementListSetting
 			}
 			catch(MarC_Exception $Exception)
 			{
-				$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__)[0], $Function, '/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute|ValuesSeparator)/i');
+				$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], $Function, '/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute|ValuesSeparator)/i');
 			}
 		}
 	}
@@ -245,7 +251,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), gettype($Item[0]), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Item[0]), MarC::Show_Options_Scalars());
 		}
 		
 		/*
@@ -284,7 +290,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -296,7 +302,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_Parameters(__CLASS__, __FUNCTION__), $Namespace, '[a-zA-Z]');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), $Namespace, '[a-zA-Z]');
 		}
 		
 		$this -> ElementsNamespace = $Namespace;

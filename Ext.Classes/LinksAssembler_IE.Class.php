@@ -8,7 +8,7 @@ use UniCAT\UniCAT;
  * @package VMaX-MarC
  *
  * @author Václav Macůrek <VaclavMacurek@seznam.cz>
- * @copyright 2014 - 2015 Václav Macůrek
+ * @copyright 2014 - 2016 Václav Macůrek
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
@@ -27,9 +27,7 @@ final class LinksAssembler_IE extends SimpleAssembler
 		$this -> Set_DisableTopLevel();
 		$this -> Set_Comment('IE conditional styles start', UniCAT::UNICAT_OPTION_ABOVE);
 		$this -> Set_Comment('IE conditional styles end', UniCAT::UNICAT_OPTION_BELOW);
-		$this -> Set_ConditionalComment(MarC::MARC_CODE_CONDCOMMENT_IE);
-
-		
+		$this -> Set_ConditionalComment(MarC::MARC_CODE_CONDCOMMENT_IE);	
 	}
 	
 	/**
