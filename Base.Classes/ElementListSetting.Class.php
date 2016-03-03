@@ -342,9 +342,9 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 			{
 				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[$Index], $Elements[$Index]);
 			}
-			elseif($Error == 4)
+			elseif(in_array($Error, range(2, 4)))
 			{
-				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[$Index], self::$List_AvailableElements[$Elements[$Index]]['Siblings']);
+				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[$Index], self::$List_AvailableElements[$Elements[0]]['Siblings']);
 			}
 		}
 	}

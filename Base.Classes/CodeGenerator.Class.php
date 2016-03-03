@@ -107,6 +107,15 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
 		}
+
+		if(is_array(self::$List_AvailableElements[$this -> Element]['Siblings']) && in_array('#PCDATA', self::$List_AvailableElements[$this -> Element]['Siblings']))
+		{
+			$this -> Enable_OneLineElement = TRUE;
+		}
+		elseif(!is_array(self::$List_AvailableElements[$this -> Element]['Siblings']) && self::$List_AvailableElements[$this -> Element]['Siblings'] == '#PCDATA')
+		{
+			$this -> Enable_OneLineElement = TRUE;
+		}
 	}
 	
 	/**
@@ -143,27 +152,6 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 
 		$this -> Enable_InLineElement = $Position;
-	}
-
-	/**
-	 * enables creation of one-line element
-	 *
-	 * @return void
-	 */
-	public function Set_EnableOneLineElement()
-	{
-		$this -> Enable_OneLineElement = TRUE;
-	}
-	
-	/**
-	 * disables creation of one-line element
-	 *
-	 * @return void
-	 * @throws nothing
-	 */
-	public function Set_DisableOneLineElement()
-	{
-		$this -> Enable_OneLineElement = FALSE;
 	}
 	
 	/**
