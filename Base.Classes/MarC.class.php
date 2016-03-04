@@ -19,7 +19,7 @@ use UniCAT\ClassScope;
  *
  * class for easier access to class constants of interfaces
  */
-final class MarC extends UniCAT implements I_MarC_Expressions_Union, I_MarC_Options_ContentUsage, I_MarC_Options_ElementSetting, I_MarC_Texts_Exceptions, I_MarC_Texts_CodeHeading, I_MarC_Texts_ConditionalComments
+final class MarC extends UniCAT implements I_MarC_Expressions_Union, I_MarC_Options_Union, I_MarC_Texts_Union, I_MarC_Exceptions
 {
 	use CodeExport, CodeMemory, Comments, ConditionalComments,
 	InstanceOptions
@@ -39,8 +39,8 @@ final class MarC extends UniCAT implements I_MarC_Expressions_Union, I_MarC_Opti
 		self::$Options['element_construction'] = ClassScope::Get_ConstantsValues("MarC\I_MarC_Options_ElementConstruction");
 		self::$Options['content_usage'] = ClassScope::Get_ConstantsValues("MarC\I_MarC_Options_ContentUsage");
 		self::$Options['values_separation'] = ClassScope::Get_ConstantsValues("MarC\I_MarC_Options_ValuesSeparation");
-		self::$Options['element_setting'] = ClassScope::Get_ConstantsValues("MarC\I_MarC_Options_ElementSetting");
-		self::$Options['inline_setting'] = ClassScope::Get_ConstantsValues("MarC\I_MarC_Options_InLineSetting");
+		self::$Options['element_setting'] = ClassScope::Get_ConstantsValues("MarC\I_MarC_Options_ElementsSetting");
+		self::$Options['in_line_setting'] = ClassScope::Get_ConstantsValues("MarC\I_MarC_Options_InLineSetting");
 		self::$Options['code_heading'] = ClassScope::Get_ConstantsValues('MarC\I_MarC_Texts_CodeHeading');
 	}
 }

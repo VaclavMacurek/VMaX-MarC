@@ -17,7 +17,7 @@ interface I_MarC_Texts_CodeGenerator
 	/**
 	 * order of %s: style name, style value
 	 */
-	const MARC_CODE_STYLES_1 = '%s: %s;';
+	const MARC_CODE_STYLES_ONE = '%s: %s;';
 	/**
 	 * order of %s: styles
 	 */
@@ -169,28 +169,35 @@ interface I_MarC_Texts_ConditionalComments
 	const MARC_CODE_CONDCOMMENT_GTEIE11 = "\n<!--[if gte IE 11]>\n\t%s\n\t\n<![endif]-->\n";
 }
 
+/**
+ * interface for class DTDLine;
+ * these constants are not construction texts with possibility of adding of any text;
+ * they are inserterd into code as they are
+ */
 interface I_MarC_Texts_CodeHeading
 {
 	/**
-	 * without posibility to add any text;
 	 * XHTML1 Strict
 	 */
 	const MARC_CODE_XHTML1STRICT = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
 	/**
-	 * without posibility to add any text;
 	 * XHTML1 Transitional
 	 */
 	const MARC_CODE_XHTML1TRANS = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/xhtml1-transitional.dtd">';
 	/**
-	 * without posibility to add any text;
 	 * XHTML1 Frameset
 	 */
 	const MARC_CODE_XHTML1FRAME = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">';
 	/**
-	 * without posibility to add any text;
 	 * XML
 	 */
 	const MARC_CODE_XML = '<?xml version="1.0" encoding="UTF-8" ?>';
+}
+
+interface I_MarC_Texts_Union extends	I_MarC_Texts_CodeHeading,
+								I_MarC_Texts_ConditionalComments
+{
+
 }
 
 ?>

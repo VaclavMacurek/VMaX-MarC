@@ -89,7 +89,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if(empty($Element))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 			}
 			else
 			{
@@ -137,18 +137,18 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 *
 	 * @throws MarC_Exception if position was set by unsupported wrong
 	 */
-	public function Set_EnableInLineElement($Position=MARC_CODE_)
+	public function Set_EnableInLineElement($Position=MarC::MARC_OPTION_LEFT)
 	{
 		try
 		{
 			if(!in_array($Position, MarC::Show_Options_InlineSetting()))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_DMDOPTION);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], UniCAT::Show_Options_CommentPosition());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], MarC::Show_Options_InLineSetting());
 		}
 
 		$this -> Enable_InLineElement = $Position;
@@ -235,7 +235,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if(!empty($Value))
 			{
-				$Text[] = sprintf(self::MARC_CODE_STYLES_1, $Name, $Value);
+				$Text[] = sprintf(self::MARC_CODE_STYLES_ONE, $Name, $Value);
 			}
 		}
 		
@@ -269,11 +269,11 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 */
 	private function Convert_PrepareText()
 	{
-		if(self::$List_AvailableElements[$this -> Element]['Siblings'] == 'EMPTY')
+		if(self::$List_AvailableElements[$this -> Element]['Siblings'] == MarC::MARC_OPTION_EMPTY)
 		{
 			switch($this -> Enable_InLineElement)
 			{
-				case self::MARC_OPTION_FRONT:
+				case self::MARC_OPTION_LEFT:
 					if(count($this -> Text) == 0)
 					{
 						$this -> Text[] = '';
@@ -292,7 +292,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 						$this -> Text = array_slice($this -> Text, 0, 2);
 					}
 					break;
-				case self::MARC_OPTION_AFTER:
+				case self::MARC_OPTION_RIGHT:
 					if(count($this -> Text) == 0)
 					{
 						$this -> Text[] = '';
@@ -336,7 +336,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			switch($this -> Enable_InLineElement)
 			{
-				case self::MARC_OPTION_FRONT:
+				case self::MARC_OPTION_LEFT:
 					if(count($this -> Text) == 0)
 					{
 						$this -> Text[] = '';
@@ -362,7 +362,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 						$this -> Text = array_slice($this -> Text, 0, 3);
 					}
 					break;
-				case self::MARC_OPTION_AFTER:
+				case self::MARC_OPTION_RIGHT:
 					if(count($this -> Text) == 0)
 					{
 						$this -> Text[] = '';
@@ -429,7 +429,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if(empty($Parts))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -441,7 +441,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if(count($Parts) != 4)
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_DMDEQARGS);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDEQARGS);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -464,30 +464,30 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		$Text = $Parts[3];
 		$AttributesStyles = FALSE;
 		
-		if( ($Attributes != self::MARC_OPTION_NOATTRIBUTE) && ($Styles != self::MARC_OPTION_NOSTYLE) )
+		if( ($Attributes != self::MARC_OPTION_NOATTR) && ($Styles != self::MARC_OPTION_NOSTL) )
 		{
 			$AttributesStyles = $Attributes." ".$Styles;
 		}
-		elseif( ($Attributes != self::MARC_OPTION_NOATTRIBUTE) && ($Styles == self::MARC_OPTION_NOSTYLE) )
+		elseif( ($Attributes != self::MARC_OPTION_NOATTR) && ($Styles == self::MARC_OPTION_NOSTL) )
 		{
 			$AttributesStyles = $Attributes;
 		}
-		elseif( ($Attributes == self::MARC_OPTION_NOATTRIBUTE) && ($Styles != self::MARC_OPTION_NOSTYLE) )
+		elseif( ($Attributes == self::MARC_OPTION_NOATTR) && ($Styles != self::MARC_OPTION_NOSTL) )
 		{
 			$AttributesStyles = $Styles;
 		}
-		elseif( ($Attributes == self::MARC_OPTION_NOATTRIBUTE) && ($Styles == self::MARC_OPTION_NOSTYLE) )
+		elseif( ($Attributes == self::MARC_OPTION_NOATTR) && ($Styles == self::MARC_OPTION_NOSTL) )
 		{
 			$AttributesStyles = "";
 		}
 		
-		if(self::$List_AvailableElements[$this -> Element]['Siblings'] != 'EMPTY')
+		if(self::$List_AvailableElements[$this -> Element]['Siblings'] != MarC::MARC_OPTION_EMPTY)
 		{
 			switch($this -> Enable_InLineElement)
 			{
-				case self::MARC_OPTION_FRONT:
+				case self::MARC_OPTION_LEFT:
 					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$List_AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
-				case self::MARC_OPTION_AFTER:
+				case self::MARC_OPTION_RIGHT:
 					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$List_AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
 				case self::MARC_OPTION_BOTH:
 					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$List_AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
@@ -499,9 +499,9 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			switch($this -> Enable_InLineElement)
 			{
-				case self::MARC_OPTION_FRONT:
+				case self::MARC_OPTION_LEFT:
 					return sprintf($Text[0], $Form, $this -> Element, $AttributesStyles, $Text[1]);
-				case self::MARC_OPTION_AFTER:
+				case self::MARC_OPTION_RIGHT:
 					return sprintf($Text[0], $Form, $this -> Element, $AttributesStyles, $Text[1]);
 				case self::MARC_OPTION_BOTH:
 					return sprintf($Text[0], $Form, $this -> Element, $AttributesStyles, $Text[1]);
@@ -529,7 +529,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if(empty($Name))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -564,7 +564,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if(empty($Name))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -580,7 +580,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if((empty($Value) && $Value != 0) && self::$Enable_NoValueAttributes == FALSE)
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING, MarC::MARC_EXCEPTIONS_XPLN_EMPTYATTR);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING, MarC::MARC_XCPT_XPLN_EMPTYATTR);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -598,9 +598,9 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 			{
 				try
 				{
-					if(!in_array(gettype($Value), MarC::Show_Options_Basics()))
+					if(!in_array(gettype($Value), MarC::Show_Options_Scalars()))
 					{
-						throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_WRONGVALTYPE);
+						throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
 					}
 					else
 					{
@@ -656,7 +656,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if(empty($Attribute))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -668,7 +668,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if(empty($Separator))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -701,7 +701,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if(self::$List_AvailableElements[$this -> Element]['Siblings'] == 'EMPTY' && $this -> Enable_InLineElement == FALSE)
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_VAR, UniCAT::UNICAT_EXCEPTIONS_SEC_VAR_DMDFUNCTION2);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_VAR, UniCAT::UNICAT_XCPT_SEC_VAR_DMDFUNCTION2);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -713,12 +713,29 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if(!in_array(gettype($Text), MarC::Show_Options_Scalars()))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_WRONGVALTYPE);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
 			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Text), MarC::Show_Options_Scalars());
+		}
+
+		try
+		{
+			if(preg_match(MarC::MARC_XPSN_PSNELMT_GNRDCODE, $Text) && self::$List_AvailableElements[$this -> Element]['Siblings'] == MarC::MARC_OPTION_DATA)
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_PRHBOPTION, MarC::MARC_XCPT_XPLN_DTDFILE);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), $Text);
+		}
+
+		if(preg_match(MarC::MARC_XPSN_PSNELMT_GNRDCODE, $Text))
+		{
+			$this -> Enable_OneLineElement = FALSE;
 		}
 		
 		$this -> Text[] = $Text;
@@ -741,8 +758,8 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		/*
 		 * conversion of arrays of set styles and attributes into texts
 		 */
-		$Styles = isset($this -> ElementStyles_Global[$this -> Element]) ? $this -> Convert_Styles($this -> ElementStyles_Global[$this -> Element]) : self::MARC_OPTION_NOSTYLE;
-		$Attributes = isset($this -> ElementAttributes_Global[$this -> Element]) ? $this -> Convert_Attributes($this -> ElementAttributes_Global[$this -> Element]) : self::MARC_OPTION_NOATTRIBUTE;
+		$Styles = isset($this -> ElementStyles_Global[$this -> Element]) ? $this -> Convert_Styles($this -> ElementStyles_Global[$this -> Element]) : self::MARC_OPTION_NOSTL;
+		$Attributes = isset($this -> ElementAttributes_Global[$this -> Element]) ? $this -> Convert_Attributes($this -> ElementAttributes_Global[$this -> Element]) : self::MARC_OPTION_NOATTR;
 		
 		/*
 		 * detection of closed/empty element
@@ -753,7 +770,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			if($IsClosedElement == TRUE && $this -> Text == FALSE)
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_VAR, UniCAT::UNICAT_EXCEPTIONS_SEC_VAR_DMDFUNCTION2, MarC::MARC_EXCEPTIONS_XPLN_CLOSEDELMT);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_VAR, UniCAT::UNICAT_XCPT_SEC_VAR_DMDFUNCTION2, MarC::MARC_XCPT_XPLN_CLOSEDELMT);
 			}
 		}
 		catch(MarC_Exception $Exception)

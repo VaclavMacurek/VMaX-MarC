@@ -2,8 +2,6 @@
 
 namespace MarC;
 
-use UniCAT\I_UniCAT_Texts_Exceptions;
-
 /**
  * @package VMaX-MarC
  *
@@ -14,32 +12,28 @@ use UniCAT\I_UniCAT_Texts_Exceptions;
  *
  * exceptions explanation texts
  */
-interface I_MarC_Texts_Exceptions extends I_UniCAT_Texts_Exceptions
+interface I_MarC_Exceptions
 {
 	/**
 	 * explanation of possible alternative way
 	 */
-	const MARC_EXCEPTIONS_XPLN_EMPTYATTR = 'EXPLANATION: Use function %s to allow attributes without value';
+	const MARC_XCPT_XPLN_EMPTYATTR = 'EXPLANATION: Use function %s to allow attributes without value';
 	/**
 	 * explanation of empty element
 	 */
-	const MARC_EXCEPTIONS_XPLN_EMPTYELMT = 'EXPLANATION: Empty element cannot wrap text - use called function to add text to the front of element or behind element';
+	const MARC_XCPT_XPLN_EMPTYELMT = 'EXPLANATION: Empty element cannot wrap text - use called function to add text to the front of element or behind element';
 	/**
 	 * explanation of closed element
 	 */
-	const MARC_EXCEPTIONS_XPLN_CLOSEDELMT = 'EXPLANATION: Closed element has to wrap text - using of function Set_Text without parameter is valid';
+	const MARC_XCPT_XPLN_CLOSEDELMT = 'EXPLANATION: Closed element has to wrap text - using of function Set_Text without parameter is valid';
 	/**
 	 * explanation of used element
 	 */
-	const MARC_EXCEPTIONS_XPLN_USEDELMT = 'EXPLANATION: Styles and attributes may be set only to used elements';
-	/**
-	 * explanation of element tree validity
-	 */
-	const MARC_EXCEPTIONS_XPLN_ELMTTREEVALID = 'EXPLANARTION: Element tree validity can be checked only for at least two elements';
+	const MARC_XCPT_XPLN_USEDELMT = 'EXPLANATION: Styles and attributes may be set only to used elements';
 	/**
 	 * explanation by too many options
 	 */
-	const MARC_EXCEPTIONS_XPLN_DTDFILE = 'EXPLANATION: Read DTD file to see allowed options';
+	const MARC_XCPT_XPLN_DTDFILE = 'EXPLANATION: Read DTD file to see allowed options';
 	
 }
 

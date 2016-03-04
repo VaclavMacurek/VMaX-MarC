@@ -16,7 +16,7 @@ use UniCAT\MethodScope;
  *
  * setting of element list
  */
-class ElementListSetting implements I_MarC_Expressions_ElementListSetting
+class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 {
 	use ErrorOptions;
 	
@@ -84,7 +84,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 			 */
 			if($ResetList !== FALSE && $ResetList !== TRUE && $ResetList !== NULL)
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_DMDOPTION);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch (MarC_Exception $Exception)
@@ -100,7 +100,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 			{
 				if(empty(self::$List_AvailableElements))
 				{
-					throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+					throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 				}
 			}
 		}
@@ -113,7 +113,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		{
 			if(!file_exists($File))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_SRC_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_SRC_MISSING);
 			}
 		}
 		catch (MarC_Exception $Exception)
@@ -135,18 +135,18 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 	 * @return void
 	 *
 	 * @throws MarC_Exception if element names were not set
-	 * @throws MarC_Exception if element names do not match pattern of element name
+	 * @throws MarC_Exception if element names do not match PTRN of element name
 	 *
 	 * @example Set_AddElement('example', '/example');
 	 * @example Set_AddElement('example', 'example');
 	 */
-	public function Set_AddElement($Open="", $Close="", $Siblings="")
+	public function Set_AddElement($Name="", $Siblings="")
 	{
 		try
 		{
-			if(empty($Open))
+			if(empty($Name))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -156,45 +156,21 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		
 		try
 		{
-			if(empty($Close))
+			if(!preg_match(MarC::MARC_XPSN_NAME_ELEMENT_OPEN, $Open))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGREGEX);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
-		}
-		
-		try
-		{
-			if(!preg_match(MarC::MARC_PATTERN_NAME_ELEMENT_OPEN, $Open))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_WRONGREGEX);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], MarC::MARC_PATTERN_NAME_ELEMENT_OPEN);
-		}
-		
-		try
-		{
-			if(!preg_match(MarC::MARC_PATTERN_NAME_ELEMENT_OPEN, $Close) || !preg_match('/'.MarC::MARC_PATTERN_NAME_ELEMENT_CLOSE, $Close))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_WRONGREGEX);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], array(MarC::MARC_PATTERN_NAME_ELEMENT_OPEN, MarC::MARC_PATTERN_NAME_ELEMENT_CLOSE, MarC::MARC_PATTERN_NAME_IECONDITION_CLOSE));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], MarC::MARC_XPSN_NAME_ELEMENT_OPEN);
 		}
 		
 		try
 		{
 			if(!is_array($Siblings) || !is_string($Siblings))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_WRONGVALTYPE);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -206,7 +182,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		{
 			if(is_string($Siblings) && !in_array($Siblings, MarC::Show_Options_ElementSetting()))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_DMDOPTION);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -255,7 +231,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		{
 			if(empty($Elements))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -270,7 +246,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 				if(is_array($Elements[$Index]) && (count($Elements) == 1 || $Index != count($Elements)-1))
 				{
 					$Error = $Index;
-					throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_WRONGVALTYPE);
+					throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
 				}	
 			}			
 		}
@@ -283,7 +259,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		{
 			if(count($Elements) == 1 && !array_key_exists($Elements[0], self::$List_AvailableElements))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_PRHBOPTION, MarC::MARC_EXCEPTIONS_XPLN_DTDFILE);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_PRHBOPTION, MarC::MARC_XCPT_XPLN_DTDFILE);
 			}
 		}
 		catch(MarC_Exception $Exception)
@@ -325,11 +301,11 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 
 			if($Error == 1)
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_PRHBOPTION, MarC::MARC_EXCEPTIONS_XPLN_DTDFILE);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_PRHBOPTION, MarC::MARC_XCPT_XPLN_DTDFILE);
 			}
 			elseif(in_array($Error, range(2, 4)))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_EXCEPTIONS_MAIN_CLS, UniCAT::UNICAT_EXCEPTIONS_MAIN_FNC, UniCAT::UNICAT_EXCEPTIONS_MAIN_PRM, UniCAT::UNICAT_EXCEPTIONS_SEC_PRM_DMDOPTION);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 			else
 			{
@@ -369,8 +345,8 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		 * searches for elements;
 		 * searches for entities
 		 */
-		$Result = preg_match_all(self::MARC_PATTERN_DEFINITION_ELEMENT_NAMECONTENT, $File, $Elements, PREG_SET_ORDER);
-		$Result = preg_match_all(self::MARC_PATTERN_DEFINITION_ENTITY_BLOCK, $File, $Entities, PREG_SET_ORDER);
+		$Result = preg_match_all(self::MARC_XPSN_DTDELMT_NAMECONTENT, $File, $Elements, PREG_SET_ORDER);
+		$Result = preg_match_all(self::MARC_XPSN_DTDNTT_BLOCK, $File, $Entities, PREG_SET_ORDER);
 		
 		/*
 		 * converts entities to usable form
@@ -398,7 +374,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 	 */
 	private function Get_Siblings($ElementSetting="", $Entities="")
 	{
-		$Result = preg_match_all(self::MARC_PATTERN_DEFINITION_ENTITY_USED, $ElementSetting, $Entities_Used, PREG_PATTERN_ORDER);
+		$Result = preg_match_all(self::MARC_XPSN_DTDNTT_USED, $ElementSetting, $Entities_Used, PREG_PATTERN_ORDER);
 		
 		if($Result)
 		{
@@ -413,7 +389,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 			$ElementSetting = str_replace($Replace_What, $Replace_With, $ElementSetting);
 		}
 		
-		$Result = preg_match_all(self::MARC_PATTERN_DEFINITION_ELEMENT_CONTENT, $ElementSetting, $Elements, PREG_PATTERN_ORDER);
+		$Result = preg_match_all(self::MARC_XPSN_DTDELMT_CONTENT, $ElementSetting, $Elements, PREG_PATTERN_ORDER);
 		
 		if($Result)
 		{
@@ -439,7 +415,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementListSetting
 		
 		foreach($Entities as $Entity)
 		{
-			$Result = preg_match_all(self::MARC_PATTERN_DEFINITION_ENTITY_NAMECONTENT, $Entity[1], $Entity, PREG_PATTERN_ORDER);
+			$Result = preg_match_all(self::MARC_XPSN_DTDNTT_NAMECONTENT, $Entity[1], $Entity, PREG_PATTERN_ORDER);
 			
 			$Entities_New[trim($Entity['EntityName'][0])] = $Entity['EntitySetting'][0];
 		}
