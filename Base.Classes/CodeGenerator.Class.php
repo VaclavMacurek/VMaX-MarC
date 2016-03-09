@@ -17,7 +17,7 @@ use UniCAT\MethodScope;
  *
  * generation of almost any markup code
  */
-final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_CodeGenerator, I_MarC_Options_ElementConstruction, I_MarC_Options_InLineSetting
+final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_CodeGenerator, I_MarC_Options_InLineSetting, I_MarC_Placeholders
 {
 	use ConditionalComments, StylesAttributesSetting, CodeExport, Comments;
 	
