@@ -64,21 +64,15 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	private static $Disable_Indention;
 	
 	/**
-	 * sets used element;
-	 * enables/disables usage of XML styled empty elements
+	 * sets used element
 	 *
 	 * @param string $Element
-	 * @param bool $XMLStyle
-	 *
-	 * @return void
 	 *
 	 * @throws MarC_Exception if element name was not set
-	 * @throws MarC_Exception if XML-style was enabled by wrong option
 	 *
 	 * @example new CodeGenerator('a');
-	 * @example new CodeGenerator('input', TRUE);
 	 */
-	public function __construct($Element="")
+	public function __construct($Element)
 	{
 		/*
 		 * disables multiple new lines and shortens code in that way
@@ -105,7 +99,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 
 		if(is_array(self::$List_AvailableElements[$this -> Element]['Siblings']) && in_array('#PCDATA', self::$List_AvailableElements[$this -> Element]['Siblings']))
@@ -148,7 +142,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], MarC::Show_Options_InLineSetting());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_InLineSetting());
 		}
 
 		$this -> Enable_InLineElement = $Position;
@@ -221,6 +215,234 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	}
 	
 	/**
+	 * add style to element
+	 *
+	 * @param string $Name name of style
+	 * @param string $Value value of style
+	 *
+	 * @throws MarC_Exception if style name was not set
+	 *
+	 * @example Set_Style('font-family', 'sans-serif');
+	 */
+	public function Set_Style($Name, $Value="")
+	{
+		try
+		{
+			if(empty($Name))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
+		}
+		
+		if($this -> Check_StyleName($Name))
+		{
+			$this -> Set_AllElementsStyles($this -> Element, $Name, $Value);
+		}
+	}
+	
+	/**
+	 * add attributes to element
+	 *
+	 * @param string $Name
+	 * @param string $Value
+	 *
+	 * @return void
+	 *
+	 * @throws MarC_Exception if attribute name was not set
+	 * @throws MarC_Exception if attribute value was not set (if attributes without value were not enabled)
+	 * @throws MarC_Exception if attribute value was not set as string, integer or double
+	 *
+	 * @example Set_Attribute('id', 'example');
+	 * @example Set_Attribute('points', array(110, 225, 254, 100) );
+	 */
+	public function Set_Attribute($Name, $Value="")
+	{
+		try
+		{
+			if(empty($Name))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
+		}
+
+		/*
+		 * attribute value may be empty;
+		 * empty values for attributes MUST be enabled by using of separated function (Set_EnableNoValueAttributes)
+		 */
+		try
+		{
+			if((empty($Value) && $Value != 0) && self::$Enable_NoValueAttributes == FALSE)
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING, MarC::MARC_XCPT_XPLN_EMPTYATTR);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), 'Set_EnableNoValueAttributes');
+		}
+		
+		if($this -> Check_AttributeName($Name))
+		{
+			if(self::$Enable_NoValueAttributes == TRUE)
+			{
+				$this -> Set_AllElementsAttributes($this -> Element, $Name, $Value);
+			}
+			else
+			{
+				try
+				{
+					if(!in_array(gettype($Value), MarC::Show_Options_Scalars()))
+					{
+						throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
+					}
+					else
+					{
+						if(in_array(gettype($Value), MarC::Show_Options_Scalars()))
+						{
+							$this -> Set_AllElementsAttributes($this -> Element, $Name, $Value);
+						}
+						else
+						{
+							if(key_exists($Name, $this -> ValuesSeparators_Global))
+							{
+								/*
+								 * selected option for sticking of multiple values;
+								 * if character was set for current attribute
+								 */
+								$this -> Set_AllElementsAttributes($this -> Element, $Name, implode($this -> ValuesSeparators_Global[$Name], $Value));
+							}
+							else
+							{
+								/*
+								 * default option for sticking of multiple values;
+								 * if character was not set for current attribute
+								 */
+								$this -> Set_AllElementsAttributes($this -> Element, $Name, implode(MarC::Show_Options_ValuesSeparation()[1], $Value));
+							}
+							
+						}
+					}
+				}
+				catch(MarC_Exception $Exception)
+				{
+					$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), gettype($Value), MarC::Show_Options_Scalars());
+				}
+			}
+		}
+	}
+	
+	/**
+	 * sets separator of values of attributes;
+	 * this function has to be in the front of functions for setting of attributes
+	 *
+	 * @param string $Attribute
+	 * @param string $Separator
+	 *
+	 * @throws MarC_Exception if attribute name was not set
+	 * @throws MarC_Exception if separator was not set
+	 *
+	 * @example Set_ValuesSeparator('class', ',');
+	 */
+	public function Set_ValuesSeparator($Attribute, $Separator=MarC::MARC_OPTION_SPC)
+	{
+		try
+		{
+			if(empty($Attribute))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
+		}
+		
+		try
+		{
+			if(in_array($Separator, MarC::Show_Options_ValuesSeparation()))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_ValuesSeparation());
+		}
+		
+		$this -> Set_AllValuesSeparators($Attribute, $Separator);
+	}
+	
+	/**
+	 * set text into element;
+	 * code generated by previous objects of class CodeGenerator is allowed
+	 *
+	 * @param string $Text
+	 *
+	 * @return void
+	 *
+	 * @throws MarC_Exception if it was set and empty element was used without using of function Set_InLineElement
+	 * @throws MarC_Exception if it was not set as string, integer or double
+	 *
+	 * @example Set_Text();
+	 * @example Set_Text(1331);
+	 * @example Set_Text('example');
+	 * @example Set_Text($Example);
+	 */
+	public function Set_Text($Text="")
+	{
+		try
+		{
+			if(self::$List_AvailableElements[$this -> Element]['Siblings'] == 'EMPTY' && $this -> Enable_InLineElement == FALSE)
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_VAR, UniCAT::UNICAT_XCPT_SEC_VAR_DMDFUNCTION2);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_VariableNameAsText($this -> Element), $this -> Element);
+		}
+		
+		try
+		{
+			if(!in_array(gettype($Text), MarC::Show_Options_Scalars()))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Text), MarC::Show_Options_Scalars());
+		}
+
+		try
+		{
+			if(preg_match(MarC::MARC_XPSN_PSNELMT_GNRDCODE, $Text) && self::$List_AvailableElements[$this -> Element]['Siblings'] == MarC::MARC_OPTION_DATA)
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_PRHBOPTION, MarC::MARC_XCPT_XPLN_DTDFILE);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), $Text);
+		}
+
+		if(preg_match(MarC::MARC_XPSN_PSNELMT_GNRDCODE, $Text))
+		{
+			$this -> Enable_OneLineElement = FALSE;
+		}
+		
+		$this -> Text[] = $Text;
+	}
+
+	/**
 	 * converts array of styles into text value of attribute style
 	 *
 	 * @param array $Styles
@@ -230,7 +452,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	private function Convert_Styles($Styles)
 	{
 		$Text = array();
-		
+
 		foreach($Styles AS $Name => $Value)
 		{
 			if(!empty($Value))
@@ -238,10 +460,10 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 				$Text[] = sprintf(self::MARC_CODE_STYLES_ONE, $Name, $Value);
 			}
 		}
-		
+
 		return sprintf(self::MARC_CODE_STYLES_FULL, implode(" ", $Text) );
 	}
-	
+
 	/**
 	 * conversion of array of attributes to text
 	 *
@@ -257,7 +479,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			$Text[] = sprintf(self::MARC_CODE_ATTRIBUTES, $Name, $Value);
 		}
-		
+
 		return implode(" ", $Text);
 	}
 
@@ -342,7 +564,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 						$this -> Text[] = '';
 						$this -> Text[] = '';
 						$this -> Text[] = '';
-						
+
 					}
 					elseif(count($this -> Text) == 1)
 					{
@@ -415,28 +637,16 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 			}
 		}
 	}
-	
+
 	/**
 	 * assembles part of code
 	 *
 	 * @return string
 	 */
-	private function Get_AssembledCode($Parts="")
+	private function Get_AssembledCode($Parts)
 	{
 		$Parts = func_get_args();
-		
-		try
-		{
-			if(empty($Parts))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
-		}
-		
+
 		try
 		{
 			if(count($Parts) != 4)
@@ -446,9 +656,9 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), 4);
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), 4);
 		}
-		
+
 		/*
 		 * extraction of parts that will be assembled into only one text;
 		 * Form - where will be added other parts;
@@ -463,7 +673,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		$Styles = $Parts[2];
 		$Text = $Parts[3];
 		$AttributesStyles = FALSE;
-		
+
 		if( ($Attributes != self::MARC_OPTION_NOATTR) && ($Styles != self::MARC_OPTION_NOSTL) )
 		{
 			$AttributesStyles = $Attributes." ".$Styles;
@@ -480,7 +690,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			$AttributesStyles = "";
 		}
-		
+
 		if(self::$List_AvailableElements[$this -> Element]['Siblings'] != MarC::MARC_OPTION_EMPTY)
 		{
 			switch($this -> Enable_InLineElement)
@@ -509,236 +719,6 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 					return sprintf($Form, $this -> Element, $AttributesStyles);
 			}
 		}
-	}
-	
-	/**
-	 * add style to element
-	 *
-	 * @param string $Name
-	 * @param string $Value
-	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if style name was not set
-	 *
-	 * @example Set_Style('font-family', 'sans-serif');
-	 */
-	public function Set_Style($Name="", $Value="")
-	{
-		try
-		{
-			if(empty($Name))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
-		}
-		
-		if($this -> Check_StyleName($Name))
-		{
-			$this -> Set_AllElementsStyles($this -> Element, $Name, $Value);
-		}
-	}
-	
-	/**
-	 * add attributes to element
-	 *
-	 * @param string $Name
-	 * @param string $Value
-	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if attribute name was not set
-	 * @throws MarC_Exception if attribute value was not set (if attributes without value were not enabled)
-	 * @throws MarC_Exception if attribute value was not set as string, integer or double
-	 *
-	 * @example Set_Attribute('id', 'example');
-	 * @example Set_Attribute('points', array(110, 225, 254, 100) );
-	 */
-	public function Set_Attribute($Name="", $Value="")
-	{
-		try
-		{
-			if(empty($Name))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
-		}
-		
-		/*
-		 * attribute value may be empty;
-		 * empty values for attributes MUST be enabled by using of separated function (Set_EnableNoValueAttributes)
-		 */
-		try
-		{
-			if((empty($Value) && $Value != 0) && self::$Enable_NoValueAttributes == FALSE)
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING, MarC::MARC_XCPT_XPLN_EMPTYATTR);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], 'Set_EnableNoValueAttributes');
-		}
-		
-		if($this -> Check_AttributeName($Name))
-		{
-			if(self::$Enable_NoValueAttributes == TRUE)
-			{
-				$this -> Set_AllElementsAttributes($this -> Element, $Name, $Value);
-			}
-			else
-			{
-				try
-				{
-					if(!in_array(gettype($Value), MarC::Show_Options_Scalars()))
-					{
-						throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
-					}
-					else
-					{
-						if(in_array(gettype($Value), MarC::Show_Options_Scalars()))
-						{
-							$this -> Set_AllElementsAttributes($this -> Element, $Name, $Value);
-						}
-						else
-						{
-							if(key_exists($Name, $this -> ValuesSeparators_Global))
-							{
-								/*
-								 * selected option for sticking of multiple values;
-								 * if character was set for current attribute
-								 */
-								$this -> Set_AllElementsAttributes($this -> Element, $Name, implode($this -> ValuesSeparators_Global[$Name], $Value));
-							}
-							else
-							{
-								/*
-								 * default option for sticking of multiple values;
-								 * if character was not set for current attribute
-								 */
-								$this -> Set_AllElementsAttributes($this -> Element, $Name, implode(MarC::Show_Options_ValuesSeparation()[1], $Value));
-							}
-							
-						}
-					}
-				}
-				catch(MarC_Exception $Exception)
-				{
-					$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($Value), MarC::Show_Options_Scalars());
-				}
-			}
-		}
-	}
-	
-	/**
-	 * sets separator of values of attributes;
-	 * this function has to be in the front of functions for setting of attributes
-	 *
-	 * @param string $Attribute
-	 * @param string $Separator
-	 *
-	 * @throws MarC_Exception if attribute name was not set
-	 * @throws MarC_Exception if separator was not set
-	 *
-	 * @example Set_ValuesSeparator('class', ',');
-	 */
-	public function Set_ValuesSeparator($Attribute="", $Separator="")
-	{
-		try
-		{
-			if(empty($Attribute))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
-		}
-		
-		try
-		{
-			if(empty($Separator))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
-		}
-		
-		$this -> Set_AllValuesSeparators($Attribute, $Separator);
-	}
-	
-	/**
-	 * set text into element;
-	 * code generated by previous objects of class CodeGenerator is allowed
-	 *
-	 * @param string $Text
-	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if it was set and empty element was used without using of function Set_InLineElement
-	 * @throws MarC_Exception if it was not set as string, integer or double
-	 *
-	 * @example Set_Text();
-	 * @example Set_Text(1331);
-	 * @example Set_Text('example');
-	 * @example Set_Text($Example);
-	 */
-	public function Set_Text($Text="")
-	{
-		try
-		{
-			if(self::$List_AvailableElements[$this -> Element]['Siblings'] == 'EMPTY' && $this -> Enable_InLineElement == FALSE)
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_VAR, UniCAT::UNICAT_XCPT_SEC_VAR_DMDFUNCTION2);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_VariableNameAsText($this -> Element), $this -> Element);
-		}
-		
-		try
-		{
-			if(!in_array(gettype($Text), MarC::Show_Options_Scalars()))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Text), MarC::Show_Options_Scalars());
-		}
-
-		try
-		{
-			if(preg_match(MarC::MARC_XPSN_PSNELMT_GNRDCODE, $Text) && self::$List_AvailableElements[$this -> Element]['Siblings'] == MarC::MARC_OPTION_DATA)
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_PRHBOPTION, MarC::MARC_XCPT_XPLN_DTDFILE);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), $Text);
-		}
-
-		if(preg_match(MarC::MARC_XPSN_PSNELMT_GNRDCODE, $Text))
-		{
-			$this -> Enable_OneLineElement = FALSE;
-		}
-		
-		$this -> Text[] = $Text;
 	}
 	
 	/**

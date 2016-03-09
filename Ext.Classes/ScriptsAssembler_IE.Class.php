@@ -23,8 +23,7 @@ final class ScriptsAssembler_IE extends SimpleAssembler
 	 */
 	public function __construct()
 	{
-		parent::__construct('head', 'script');
-		$this -> Set_DisableTopLevel();
+		parent::__construct('', 'script');
 		$this -> Set_Comment('IE conditional scripts start', UniCAT::UNICAT_OPTION_ABOVE);
 		$this -> Set_Comment('IE conditional scripts end', UniCAT::UNICAT_OPTION_BELOW);
 		$this -> Set_ConditionalComment(MarC::MARC_CODE_CONDCOMMENT_IE);

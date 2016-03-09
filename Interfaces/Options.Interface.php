@@ -12,22 +12,6 @@ namespace MarC;
  */
 
 /**
- * interface for class CodeGenerator;
- * support options for element construction
- */
-interface I_MarC_Options_ElementConstruction
-{
-	/**
-	 * use in code assembling function to say that no attribute is included
-	 */
-	const MARC_OPTION_NOATTR = 'NO_ATTRIBUTE';
-	/**
-	 * use in code assembling function to say that no style is included
-	 */
-	const MARC_OPTION_NOSTL = 'NO_STYLE';
-}
-
-/**
  * interface for class SimpleAssembler;
  * support options for content usage
  */

@@ -50,7 +50,7 @@ trait ConditionalComments
 		}
 		catch(UniCAT_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -62,7 +62,7 @@ trait ConditionalComments
 		}
 		catch(UniCAT_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], ClassScope::Get_ConstantsNames('MarC\I_MarC_Texts_ConditionalComments'));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), ClassScope::Get_ConstantsNames('MarC\I_MarC_Texts_ConditionalComments'));
 		}
 	
 		static::$ConditionalComments = $Comment;

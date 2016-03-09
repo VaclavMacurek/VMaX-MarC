@@ -30,6 +30,7 @@ if(!defined('UNICAT_ADR'))
  */
 require_once MARC_ADR.'Interfaces/ConstructionTexts.Interface.php';
 require_once MARC_ADR.'Interfaces/ExceptionTexts.Interface.php';
+require_once MARC_ADR.'Interfaces/Placeholders.Interface.php';
 require_once MARC_ADR.'Interfaces/Expressions.Interface.php';
 require_once MARC_ADR.'Interfaces/Options.Interface.php';
 /*

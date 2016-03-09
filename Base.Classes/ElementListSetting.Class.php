@@ -43,7 +43,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * @example new ElementListSetting('example.dtd');
 	 * @example new ElementListSetting('example.dtd', TRUE);
 	 */
-	public function __construct($File="", $ResetList=NULL)
+	public function __construct($File, $ResetList=NULL)
 	{
 		/*
 		 * initial setting of instance of class MarC;
@@ -53,7 +53,42 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		
 		$this -> Set_ElementList($File, $ResetList);
 	}
-	
+
+	/**
+	 * prevents using of non-public functions
+	 *
+	 * @param string $Method name of function
+	 * @param array $Parameters function's parameters
+	 * 
+	 * @throws UniCAT_Exception if function does not exist
+	 * @throws UniCAT_Exception if function is not public
+	 */
+	public function __call($Method, $Parameters)
+	{
+		try
+		{
+			if(method_exists($this, $Method))
+			{
+				if(MethodScope::Check_IsPublic(__CLASS__, $Method))
+				{
+					call_user_func_array($Method, $Parameters);
+				}
+				else
+				{
+					throw new UniCAT_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_SEC_FNC_PRHBUSE1);
+				}
+			}
+			else
+			{
+				throw new UniCAT_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_SEC_FNC_MISSING1);
+			}
+		}
+		catch(UniCAT_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), $Method);
+		}
+	}
+
 	/**
 	 * setting of file with element definition;
 	 * setting if new set will be created or original list will be extended
@@ -69,46 +104,13 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * @example Set_ElementList('example.dtd');
 	 * @example Set_ElementList('example.dtd', TRUE);
 	 */
-	public function Set_ElementList($File="", $ResetList=NULL)
+	public function Set_ElementList($File, $ResetList=FALSE)
 	{
 		/*
 		 * disables multiple new lines and shortens code in that way
 		 */
 		MarC::Set_DisableMultipleNewLines();
-		
-		try
-		{
-			/*
-			 * parameter $XMLStyle may be fully empty;
-			 * or there must be used TRUE or FALSE
-			 */
-			if($ResetList !== FALSE && $ResetList !== TRUE && $ResetList !== NULL)
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
-			}
-		}
-		catch (MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], MarC::Show_Options_Booleans());
-		}
-		
-		self::$List_AvailableElements = ($ResetList === TRUE) ? array() : self::$List_AvailableElements;
-			
-		try
-		{
-			if(empty($File))
-			{
-				if(empty(self::$List_AvailableElements))
-				{
-					throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-				}
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
-		}
-		
+
 		try
 		{
 			if(!file_exists($File))
@@ -118,8 +120,26 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		}
 		catch (MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 'file '.$File);
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), 'file '.$File);
 		}
+
+		try
+		{
+			/*
+			 * parameter $XMLStyle may be fully empty;
+			 * or there must be used TRUE or FALSE
+			 */
+			if($ResetList !== FALSE && $ResetList !== TRUE)
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
+			}
+		}
+		catch (MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_Booleans());
+		}
+		
+		self::$List_AvailableElements = ($ResetList === TRUE) ? array() : self::$List_AvailableElements;		
 		
 		$this -> Get_ElementList($File);
 	}
@@ -129,7 +149,6 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * alternative to main function for cases if dtd file is not available
 	 *
 	 * @param string $Open name of element
-	 * @param string $Close closing part of element; demanded even in case of empty element; then it is needed to be equal to name of element
 	 * @param string|array $Siblings allowed siblings or construction orders
 	 *
 	 * @return void
@@ -137,33 +156,23 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * @throws MarC_Exception if element names were not set
 	 * @throws MarC_Exception if element names do not match PTRN of element name
 	 *
-	 * @example Set_AddElement('example', '/example');
-	 * @example Set_AddElement('example', 'example');
+	 * @example Set_AddElement('example');
+	 * @example Set_AddElement('example', '#PCDATA');
+	 * @example Set_AddElement('example', 'usage');
+	 * @example Set_AddElement('example', array('usage', ...) )
 	 */
-	public function Set_AddElement($Name="", $Siblings="")
-	{
+	public function Set_AddElement($Name, $Siblings=MarC::MARC_OPTION_EMPTY)
+	{		
 		try
 		{
-			if(empty($Name))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
-		}
-		
-		try
-		{
-			if(!preg_match(MarC::MARC_XPSN_NAME_ELEMENT_OPEN, $Open))
+			if(!preg_match(MarC::MARC_XPSN_ADDELMT_NAME, $Name))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGREGEX);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], MarC::MARC_XPSN_NAME_ELEMENT_OPEN);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), MarC::MARC_XPSN_ADDELMT_NAME);
 		}
 		
 		try
@@ -175,7 +184,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[2], gettype($Siblings), array('array', 'string') );
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), gettype($Siblings), array('array', 'string') );
 		}
 		
 		try
@@ -187,25 +196,25 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[2], MarC::Show_Options_ElementSetting());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_ElementSetting());
 		}
 		
 		switch($Siblings)
 		{
 			case MarC::MARC_OPTION_ANY:
-				self::$List_AvailableElements[$Open]['ClosingPart'] = $Close;
+				self::$List_AvailableElements[$Open]['ClosingPart'] = '/'.$Open;
 				self::$List_AvailableElements[$Open]['Siblings'] = array_keys(self::$List_AvailableElements);
 				break;
 			case MarC::MARC_OPTION_EMPTY:
-				self::$List_AvailableElements[$Open]['ClosingPart'] = $Close;
+				self::$List_AvailableElements[$Open]['ClosingPart'] = $Open;
 				self::$List_AvailableElements[$Open]['Siblings'] = MarC::MARC_OPTION_EMPTY;
 				break;
 			case MarC::MARC_OPTION_ONLYTEXT:
-				self::$List_AvailableElements[$Open]['ClosingPart'] = $Close;
+				self::$List_AvailableElements[$Open]['ClosingPart'] = '/'.$Open;
 				self::$List_AvailableElements[$Open]['Siblings'] = MarC::MARC_OPTION_ONLYTEXT;
 				break;
 			default:
-				self::$List_AvailableElements[$Open]['ClosingPart'] = $Close;
+				self::$List_AvailableElements[$Open]['ClosingPart'] = '/'.$Open;
 				self::$List_AvailableElements[$Open]['Siblings'] = $Siblings;
 				break;
 		}
@@ -217,54 +226,43 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * index 0 = main element, index 1 = sibling of main element, index 2 = sibling of previous element ... and so on
 	 * 
 	 * @param string|array $Elements
+	 * 
 	 * @throws MarC_Exception if no element was given
 	 * @throws MarC_Exception if one element was given
 	 * @throws MarC_Exception if any else level than last is array
 	 * @throws MarC_Exception if elements are not valid
  	 */
-	protected function Check_ElementTreeValidity($Elements="")
+	protected function Check_ElementTreeValidity($Elements)
 	{
 		$Elements = func_get_args();
 		$Error = NULL;
 		
 		try
 		{
-			if(empty($Elements))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
-		}
-		
-		try
-		{
 			for($Index = 0; $Index < count($Elements); $Index++)
 			{
-				if(is_array($Elements[$Index]) && (count($Elements) == 1 || $Index != count($Elements)-1))
+				if(is_array($Elements[$Index]) && ($Index != count($Elements)-1))
 				{
 					$Error = $Index;
 					throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
-				}	
+				}
 			}			
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), $Exception -> ExceptionWarning(__CLASS__, __FUNCTION__)[$Error], gettype($Elements[$Error]), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Elements[$Error]), MarC::Show_Options_Scalars());
 		}
 
 		try
 		{
-			if(count($Elements) == 1 && !array_key_exists($Elements[0], self::$List_AvailableElements))
+			if(count($Elements) == 1 && !is_array($Elements) && !array_key_exists($Elements[0], self::$List_AvailableElements))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_PRHBOPTION, MarC::MARC_XCPT_XPLN_DTDFILE);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), $Elements[0]);
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), $Elements[0]);
 		}
 		
 		try
@@ -289,11 +287,19 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 						break;
 					}
 				}
-				else
+				elseif(is_array($Elements[$Index] && isset($Elements[$Index-1])))
 				{
 					if(array_intersect($Elements[$Index], self::$List_AvailableElements[$Elements[$Index-1]]['Siblings']) != $Elements[$Index])
 					{
 						$Error = 4;
+						break;
+					}
+				}
+				else
+				{
+					if(array_intersect($Elements[$Index], array_keys(self::$List_AvailableElements)) != $Elements[$Index])
+					{
+						$Error = 1;
 						break;
 					}
 				}
@@ -316,11 +322,11 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		{
 			if($Error == 1)
 			{
-				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[$Index], $Elements[$Index]);
+				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), $Elements[$Index]);
 			}
 			elseif(in_array($Error, range(2, 4)))
 			{
-				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[$Index], self::$List_AvailableElements[$Elements[0]]['Siblings']);
+				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), self::$List_AvailableElements[$Elements[0]]['Siblings']);
 			}
 		}
 	}
@@ -332,7 +338,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 *
 	 * @return void
 	 */
-	private function Get_ElementList($File="")
+	private function Get_ElementList($File)
 	{
 		/*
 		 * reads file;
@@ -372,7 +378,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 *
 	 * @return array
 	 */
-	private function Get_Siblings($ElementSetting="", $Entities="")
+	private function Get_Siblings($ElementSetting, $Entities)
 	{
 		$Result = preg_match_all(self::MARC_XPSN_DTDNTT_USED, $ElementSetting, $Entities_Used, PREG_PATTERN_ORDER);
 		
@@ -409,7 +415,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 *
 	 * @return void
 	 */
-	private function Convert_SimplifyEntities(&$Entities="")
+	private function Convert_SimplifyEntities(&$Entities)
 	{	
 		$Entities_New = array();
 		
@@ -430,7 +436,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * 
 	 * @return array
 	 */
-	private function Convert_PrepareEntities(&$Entities="")
+	private function Convert_PrepareEntities(&$Entities)
 	{
 		$Entities_Old = $Entities;
 		$Entities_Final = array();

@@ -17,7 +17,7 @@ use UniCAT\MethodScope;
  *
  * generation of row of the same elements
  */
-class SimpleAssembler extends ElementListSetting implements I_MarC_Options_ContentUsage
+class SimpleAssembler extends ElementListSetting implements I_MarC_Options_ContentUsage, I_MarC_Placeholders
 {
 	use ConditionalComments, StylesAttributesSetting, CodeExport, Comments;
 	
@@ -65,25 +65,18 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 *
 	 * @example new SimpleAssembler('tr', 'td');
 	 */
-	public function __construct($TopElement="", $SubElement="")
+	public function __construct($TopElement, $SubElement)
 	{
 		/*
 		 * disables multiple new lines and shortens code in that way
 		 */
 		MarC::Set_DisableMultipleNewLines();
 
-		try
+		if(empty($TopElement))
 		{
-			if(empty($TopElement))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
+			$this -> Disable_TopLevel = TRUE;
 		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
-		}
-		
+
 		try
 		{
 			if(empty($SubElement))
@@ -93,91 +86,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
-		}
-		
-		try
-		{
-			if(	!in_array(gettype($TopElement), array('array', 'string')) )
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRMS, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), array('string', 'array'));
-		}
-		
-		try
-		{
-			if(!in_array(gettype($TopElement), array('array', 'string')))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRMS, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($SubElement), array('string', 'array'));
-		}
-		
-		try
-		{
-			if(gettype($TopElement) != gettype($SubElement))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRMS, UniCAT::UNICAT_XCPT_SEC_PRMS_DMDTYPEEQUAL);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
-		}
-		
-		try
-		{
-			if(is_array($TopElement) && count($TopElement) != 2)
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_VAR_DMDARRSIZE);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 2);
-		}
-		
-		try
-		{
-			if(is_array($SubElement) && count($SubElement) != 2)
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_VAR_DMDARRSIZE);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], 2);
-		}
-		
-		try
-		{
-			if(is_string($TopElement) && $TopElement == $SubElement)
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRMS, UniCAT::UNICAT_XCPT_SEC_PRMS_PRHBVALEQUAL);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
-		}
-		
-		try
-		{
-			if(is_array($TopElement) && $TopElement == $SubElement)
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRMS, UniCAT::UNICAT_XCPT_SEC_PRMS_PRHBVALEQUAL);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 		
 		/*
@@ -185,16 +94,14 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		 * top - top level
 		 * sub - sub level
 		 * main - really used (what will appear in code)
-		 * set - used for styles and attributes (substitution for cases if top and sub level element is the same)
+		 * set - used for styles and attributes (substitution to avoid conflict elements in top and sub level)
 		 */
-		if(is_array($TopElement))
+		if($this -> Disable_TopLevel == TRUE)
 		{
-			if($this -> Check_ElementTreeValidity($TopElement[0], $SubElement[0]))
+			if($this -> Check_ElementTreeValidity($SubElement))
 			{
-				$this -> Elements['top']['main'] = $TopElement[0];
-				$this -> Elements['top']['set'] = $TopElement[1];
-				$this -> Elements['sub']['main'] = $SubElement[0];
-				$this -> Elements['sub']['set'] = $SubElement[1];
+				$this -> Elements['sub']['main'] = $SubElement;
+				$this -> Elements['sub']['set'] = self::MARC_PLACEHOLDER_SUBELMT;
 			}
 		}
 		else
@@ -202,9 +109,9 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			if($this -> Check_ElementTreeValidity($TopElement, $SubElement))
 			{
 				$this -> Elements['top']['main'] = $TopElement;
-				$this -> Elements['top']['set'] = $TopElement;
+				$this -> Elements['top']['set'] = self::MARC_PLACEHOLDER_TOPELMT;
 				$this -> Elements['sub']['main'] = $SubElement;
-				$this -> Elements['sub']['set'] = $SubElement;
+				$this -> Elements['sub']['set'] = self::MARC_PLACEHOLDER_SUBELMT;
 			}
 		}
 	}
@@ -221,6 +128,16 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		$this -> ContentUsage = array();
 		$this -> List_UsedOrders = array();
 		$this -> Disable_TopLevel = FALSE;
+	}
+
+	/**
+	 * disables generation of top level element;
+	 * useful for generation of page's <head>, where more elements (meta, title, script, link ...) are present;
+	 * usage of this function may be accidentally avoided with using of empty argument (using argument as '')
+	 */
+	public function Set_DisableTopLevel()
+	{
+		$this -> Disable_TopLevel = TRUE;
 	}
 	
 	/**
@@ -248,7 +165,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), 2);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), 2);
 		}
 		
 		try
@@ -260,7 +177,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Item[0]), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Item[0]), MarC::Show_Options_Scalars());
 		}
 		
 		try
@@ -272,7 +189,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), (in_array(gettype($Item[0]), MarC::Show_Options_Scalars()) ? gettype($Item[1]) : gettype($Item[0])), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), (in_array(gettype($Item[0]), MarC::Show_Options_Scalars()) ? gettype($Item[1]) : gettype($Item[0])), MarC::Show_Options_Scalars());
 		}
 		
 		/*
@@ -307,14 +224,14 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 *
 	 * @example Set_ContentUsage('example', 'code', 'value');
 	 */
-	public function Set_ContentUsage($Key="", $Value="", $Attribute="")
+	public function Set_ContentUsage($Key, $Value, $Attribute=NULL)
 	{
 		/*
 		 * sets empty array;
 		 * extracts possible names of attributes
 		 */
 		$this -> ContentUsage = array();
-		$Attribute = count(func_get_args()) > 2 ? array_slice(func_get_args(), 2) : NULL;
+		$Attribute = array_slice(func_get_args(), 2);
 		
 		try
 		{
@@ -325,7 +242,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -337,7 +254,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 		
 		try
@@ -349,7 +266,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Key), 'string');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Key), 'string');
 		}
 		
 		try
@@ -361,7 +278,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($Value), 'string');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), gettype($Value), 'string');
 		}
 		
 		try
@@ -373,7 +290,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], MarC::Show_Options_SimpleAssembler());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), MarC::Show_Options_SimpleAssembler());
 		}
 		
 		try
@@ -385,44 +302,43 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], MarC::Show_Options_SimpleAssembler());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), MarC::Show_Options_SimpleAssembler());
 		}
 		
 		try
 		{
-			if((($Key == MarC::MARC_OPTION_ATTRIBUTEVALUE) || ($Value == MarC::MARC_OPTION_ATTRIBUTEVALUE)) && empty($Attribute))
+			if((($Key == MarC::MARC_OPTION_ATTRVAL) || ($Value == MarC::MARC_OPTION_ATTRVAL)) && empty($Attribute))
 			{
-				
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[2]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 2));
 		}
 		
 		try
 		{
-			if((($Key == MarC::MARC_OPTION_ATTRIBUTEVALUE) && ($Value == MarC::MARC_OPTION_ATTRIBUTEVALUE)) && count($Attribute) == 1 )
+			if((($Key == MarC::MARC_OPTION_ATTRVAL) && ($Value == MarC::MARC_OPTION_ATTRVAL)) && empty($Attribute))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDEQARGS);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[2], 2);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 2));
 		}
 		
 		try
 		{
-			if(($Key == MarC::MARC_OPTION_ELEMENTTEXT) && ($Value == MarC::MARC_OPTION_ELEMENTTEXT))
+			if(($Key == MarC::MARC_OPTION_ELMTTEXT) && ($Value == MarC::MARC_OPTION_ELMTTEXT))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRMS, UniCAT::UNICAT_XCPT_SEC_PRMS_PRHBVALEQUAL);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 		
 		/*
@@ -436,8 +352,8 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		 */
 		if(count($Attribute) == 1)
 		{
-			$this -> ContentUsage['keyattr'] = ($Key == MarC::MARC_OPTION_ATTRIBUTEVALUE) ? $Attribute[0] : FALSE;
-			$this -> ContentUsage['valueattr'] = ($Value == MarC::MARC_OPTION_ATTRIBUTEVALUE) ? $Attribute[0] : FALSE;
+			$this -> ContentUsage['keyattr'] = ($Key == MarC::MARC_OPTION_ATTRVAL) ? $Attribute[0] : FALSE;
+			$this -> ContentUsage['valueattr'] = ($Value == MarC::MARC_OPTION_ATTRVAL) ? $Attribute[0] : FALSE;
 		}
 		/*
 		 * sets names of attributes
@@ -461,7 +377,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 *
 	 * @example Set_TopLevelStyles('border-style', 'dashed')
 	 */
-	public function Set_TopLevelStyles($Name="", $Value="")
+	public function Set_TopLevelStyles($Name, $Value="")
 	{
 		try
 		{
@@ -476,7 +392,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch (MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 	}
 	
@@ -491,7 +407,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 *
 	 * @example Set_TopLevelAttributes('name', 'example')
 	 */
-	public function Set_TopLevelAttributes($Name="", $Value="")
+	public function Set_TopLevelAttributes($Name, $Value="")
 	{
 		try
 		{
@@ -506,7 +422,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch (MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 	}
 	
@@ -526,7 +442,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 *
 	 * @example Set_SubLevelStyles(1, 'border-style', 'dashed')
 	 */
-	public function Set_SubLevelStyles($Order="", $Name="", $Value="")
+	public function Set_SubLevelStyles($Order, $Name, $Value="")
 	{
 		try
 		{
@@ -537,7 +453,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 	
 		try
@@ -549,7 +465,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Order), 'integer');
 		}
 	
 		try
@@ -561,7 +477,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), 0);
 		}
 	
 		try
@@ -573,7 +489,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 	
 		/*
@@ -604,7 +520,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 *
 	 * @example Set_SubLevelAttributes(0, 'onClick', 'example()')
 	 */
-	public function Set_SubLevelAttributes($Order="", $Name="", $Value="")
+	public function Set_SubLevelAttributes($Order, $Name, $Value="")
 	{
 		try
 		{
@@ -615,7 +531,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 	
 		try
@@ -627,7 +543,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Order), 'integer');
 		}
 	
 		try
@@ -639,7 +555,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), 0);
 		}
 	
 		try
@@ -651,7 +567,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 	
 		/*
@@ -677,7 +593,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 *
 	 * @example Set_TopLevelValuesSeparator('class', ',');
 	 */
-	public function Set_TopLevelValuesSeparator($Attribute="", $Separator="")
+	public function Set_TopLevelValuesSeparator($Attribute, $Separator=MarC::MARC_OPTION_SPC)
 	{
 		try
 		{
@@ -688,19 +604,19 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 	
 		try
 		{
-			if(empty($Separator))
+			if(in_array($Separator, MarC::Show_Options_ValuesSeparation()))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_ValuesSeparation());
 		}
 	
 		$this -> Set_SelectedValuesSeparators($this -> Elements['top']['main'], $Attribute, $Separator);
@@ -717,7 +633,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 *
 	 * @example Set_SubLevelValuesSeparator('class', ',');
 	 */
-	public function Set_SubLevelValuesSeparator($Attribute="", $Separator="")
+	public function Set_SubLevelValuesSeparator($Attribute, $Separator=MarC::MARC_OPTION_SPC)
 	{
 		try
 		{
@@ -728,33 +644,22 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 	
 		try
 		{
-			if(empty($Separator))
+			if(in_array($Separator, MarC::Show_Options_ValuesSeparation()))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_ValuesSeparation());
 		}
 	
 		$this -> Set_SelectedValuesSeparators($this -> Elements['sub']['main'], $Attribute, $Separator);
-	}
-	
-	/**
-	 * disables generation of top level element;
-	 * useful for generation of page's <head>, where more elements (meta, title, script, link ...) are present
-	 *
-	 * @return void
-	 */
-	public function Set_DisableTopLevel()
-	{
-		$this -> Disable_TopLevel = TRUE;
 	}
 	
 	/**
@@ -829,7 +734,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			 * part 1;
 			 * sets name of element
 			 */
-			$VMaX = new CodeGenerator($this -> Elements['sub']['main'], TRUE);
+			$VMaX = new CodeGenerator($this -> Elements['sub']['main']);
 			
 			/*
 			 * part 2;
@@ -902,6 +807,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 					MarC::Add_ConditionalComment($this -> LocalCode, static::$ConditionalComments);
 					MarC::Add_Comments($this -> LocalCode, static::$Comments);
 					static::$ConditionalComments = FALSE;
+					static::$Comments = FALSE;
 					return MarC::Convert_Code($this -> LocalCode, __CLASS__);
 				}
 			}
@@ -990,6 +896,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			MarC::Add_ConditionalComment($this -> LocalCode, static::$ConditionalComments);
 			MarC::Add_Comments($this -> LocalCode, static::$Comments);
 			static::$ConditionalComments = FALSE;
+			static::$Comments = FALSE;
 			return MarC::Convert_Code($this -> LocalCode, __CLASS__);
 		}
 	}

@@ -68,23 +68,16 @@ class UniqueAssembler extends ElementListSetting
 	 *
 	 * @example new UniqueAssembler('html', array('head', 'body') );
 	 */
-	public function __construct($TopElement="", $SubElements="")
+	public function __construct($TopElement, $SubElements)
 	{
 		/*
 		 * disables multiple new lines and shortens code in that way
 		 */
 		MarC::Set_DisableMultipleNewLines();
 
-		try
+		if(empty($TopElement))
 		{
-			if(empty($TopElement))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$this -> Disable_TopLevel = TRUE;
 		}
 		
 		try
@@ -96,7 +89,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 		
 		try
@@ -108,7 +101,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($TopElement), 'string');
 		}
 		
 		try
@@ -120,7 +113,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($SubElements), 'array');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($SubElements), 'array');
 		}
 		
 		try
@@ -132,7 +125,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -144,13 +137,31 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 
-		if($this -> Check_ElementTreeValidity($TopElement, $SubElements))
+
+		/*
+		 * sets elements used for setting of styles and attributes;
+		 * top - top level
+		 * sub - sub level
+		 * main - really used (what will appear in code)
+		 * set - used for styles and attributes (substitution to avoid conflict elements in top and sub level)
+		 */
+		if($this -> Disable_TopLevel == TRUE)
 		{
-			$this -> Elements['top'] = $TopElement;
-			$this -> Elements['sub'] = $SubElements;
+			if($this -> Check_ElementTreeValidity($SubElements))
+			{
+				$this -> Elements['sub'] = $SubElements;
+			}
+		}
+		else
+		{
+			if($this -> Check_ElementTreeValidity($TopElement, $SubElements))
+			{
+				$this -> Elements['top'] = $TopElement;
+				$this -> Elements['sub'] = $SubElements;
+			}
 		}
 	}
 	
@@ -182,29 +193,40 @@ class UniqueAssembler extends ElementListSetting
 	 * @example Input_Attribute('type', 'text');
 	 * @example Select_ValuesSeparator('class', "\x20");
 	 */
-	public function __call($Function, array $Parameters)
+	public function __call($Method, $Parameters)
 	{
-		if(method_exists($this, $Function))
+		if(method_exists($this, $Method))
 		{
-			call_user_func_array(array($this, $Function), $Parameters);
+			call_user_func_array(array($this, $Method), $Parameters);
 		}
 		else
 		{
 			try
 			{
-				if(preg_match('/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute|ValuesSeparator)/i', $Function, $Parts))
+				if(preg_match('/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute|ValuesSeparator)/i', $Method, $Parts))
 				{
 					try
 					{
-						if(strtolower($Parts['Element']) != $this -> Elements['top'] && !in_array(strtolower($Parts['Element']), $this -> Elements['sub']))
+						if($this -> Disable_TopLevel == TRUE)
 						{
-							throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION, MarC::MARC_XCPT_XPLN_USEDELMT);
+							if(!in_array(strtolower($Parts['Element']), $this -> Elements['sub']))
+							{
+								throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION, MarC::MARC_XCPT_XPLN_USEDELMT);
+							}
+						}
+						else
+						{
+							if(strtolower($Parts['Element']) != $this -> Elements['top'] && !in_array(strtolower($Parts['Element']), $this -> Elements['sub']))
+							{
+								throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION, MarC::MARC_XCPT_XPLN_USEDELMT);
+							}
+							
 						}
 					}
 					catch(MarC_Exception $Exception)
 					{
 						array_unshift($this -> Elements['sub'], $this -> Elements['top']);
-						$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], $this -> Elements['sub']);
+						$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), $this -> Elements['sub']);
 					}
 					
 					if($Parts['Order'] == 'ValuesSeparator')
@@ -223,7 +245,7 @@ class UniqueAssembler extends ElementListSetting
 			}
 			catch(MarC_Exception $Exception)
 			{
-				$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], $Function, '/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute|ValuesSeparator)/i');
+				$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), $Method, '/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute|ValuesSeparator)/i');
 			}
 		}
 	}
@@ -251,7 +273,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Item[0]), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Item[0]), MarC::Show_Options_Scalars());
 		}
 		
 		/*
@@ -262,9 +284,8 @@ class UniqueAssembler extends ElementListSetting
 	
 	/**
 	 * disables generation of top level element;
-	 * useful for generation of page's <head>, where more elements (meta, title, script, link ...) are present
-	 *
-	 * @return void
+	 * useful for generation of page's <head>, where more elements (meta, title, script, link ...) are present;
+	 * usage of this function may be accidentally avoided with using of empty argument (using argument as '')
 	 */
 	public function Set_DisableTopLevel()
 	{
@@ -272,7 +293,7 @@ class UniqueAssembler extends ElementListSetting
 	}
 	
 	/**
-	 * allows using of namespaced elements;
+	 * allows using of namespaced elements - because _call is not designed to use namespacewd elements directly;
 	 * it is not allowed to combine namespaces
 	 *
 	 * @return void
@@ -290,7 +311,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -302,7 +323,7 @@ class UniqueAssembler extends ElementListSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), $Namespace, '[a-zA-Z]');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), $Namespace, '[a-zA-Z]');
 		}
 		
 		$this -> ElementsNamespace = $Namespace;

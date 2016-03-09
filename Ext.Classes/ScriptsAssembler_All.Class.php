@@ -23,8 +23,7 @@ final class ScriptsAssembler_All extends SimpleAssembler
 	 */
 	public function __construct()
 	{
-		parent::__construct('head', 'script');
-		$this -> Set_DisableTopLevel();
+		parent::__construct('', 'script');
 		$this -> Set_Comment('general scripts start', UniCAT::UNICAT_OPTION_ABOVE);
 		$this -> Set_Comment('general scripts end', UniCAT::UNICAT_OPTION_BELOW);
 	}

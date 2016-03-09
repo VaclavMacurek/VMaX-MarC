@@ -23,8 +23,7 @@ final class LinksAssembler_All extends SimpleAssembler
 	 */
 	public function __construct()
 	{
-		parent::__construct('head', 'link');
-		$this -> Set_DisableTopLevel();
+		parent::__construct('', 'link');
 		$this -> Set_Comment('general styles start', UniCAT::UNICAT_OPTION_ABOVE);
 		$this -> Set_Comment('general styles end', UniCAT::UNICAT_OPTION_BELOW);
 	}

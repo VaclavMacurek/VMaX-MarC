@@ -23,8 +23,7 @@ final class LinksAssembler_IE extends SimpleAssembler
 	 */
 	public function __construct()
 	{
-		parent::__construct('head', 'link');
-		$this -> Set_DisableTopLevel();
+		parent::__construct('', 'link');
 		$this -> Set_Comment('IE conditional styles start', UniCAT::UNICAT_OPTION_ABOVE);
 		$this -> Set_Comment('IE conditional styles end', UniCAT::UNICAT_OPTION_BELOW);
 		$this -> Set_ConditionalComment(MarC::MARC_CODE_CONDCOMMENT_IE);	

@@ -34,7 +34,6 @@ interface I_MarC_Exceptions
 	 * explanation by too many options
 	 */
 	const MARC_XCPT_XPLN_DTDFILE = 'EXPLANATION: Read DTD file to see allowed options';
-	
 }
 
 ?>

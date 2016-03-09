@@ -17,7 +17,7 @@ use UniCAT\MethodScope;
  *
  * generation of advanced code block (like drop-down menu - with or without optgroup)
  */
-class DualAssembler extends ElementListSetting implements I_MarC_Options_ContentUsage
+class DualAssembler extends ElementListSetting implements I_MarC_Options_ContentUsage, I_MarC_Placeholders
 {
 	use StylesAttributesSetting, CodeExport, Comments;
 	
@@ -33,7 +33,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 *
 	 * @var bool
 	 */
-	private $Enable_CorrectOrder = FALSE;
+	private $Enable_SimpleOrder = FALSE;
 	/**
 	 * elements used for creation of code
 	 *
@@ -59,60 +59,21 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 * prevents sharing of content with previous instances
 	 *
 	 * @param string $TopElement
-	 * @param string $SubElement1
-	 * @param string $SubElement2
+	 * @param string $MidElement
+	 * @param string $SubElement
 	 *
 	 * @return void
 	 *
-	 * @throws MarC_Exception if top element was not set
-	 * @throws MarC_Exception if mid element was not set
-	 * @throws MarC_Exception if sub element was not set
 	 * @throws MarC_Exception if all elements were set the same
 	 *
 	 * @example new DualAssembler('select', 'optgroup', 'option')
 	 */
-	public function __construct($TopElement="", $MidElement="", $SubElement="")
+	public function __construct($TopElement, $MidElement, $SubElement)
 	{
 		/*
 		 * disables multiple new lines and shortens code in that way
 		 */
 		MarC::Set_DisableMultipleNewLines();
-
-		try
-		{
-			if(empty($TopElement))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
-		}
-		
-		try
-		{
-			if(empty($MidElement))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
-		}
-		
-		try
-		{
-			if(empty($SubElement))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
-		}
 		
 		try
 		{
@@ -123,7 +84,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($TopElement), 'string');
 		}
 		
 		try
@@ -135,7 +96,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($TopElement), 'string');
 		}
 		
 		try
@@ -147,38 +108,17 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($TopElement), 'string');
-		}
-		
-		try
-		{
-			if(in_array($TopElement, array($MidElement, $SubElement)))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_PRHBOPTION);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], $TopElement);
-		}
-		
-		try
-		{
-			if($MidElement == $SubElement)
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_PRHBOPTION);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], $SubElement);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($TopElement), 'string');
 		}
 
 		if($this -> Check_ElementTreeValidity($TopElement, $MidElement, $SubElement))
 		{
-			$this -> Elements['top'] = $TopElement;
-			$this -> Elements['mid'] = $MidElement;
-			$this -> Elements['sub'] = $SubElement;
+			$this -> Elements['top']['main'] = $TopElement;
+			$this -> Elements['top']['set'] = self::MARC_PLACEHOLDER_MIDELMT;
+			$this -> Elements['mid']['main'] = $MidElement;
+			$this -> Elements['mid']['set'] = self::MARC_PLACEHOLDER_MIDELMT;
+			$this -> Elements['sub']['main'] = $SubElement;
+			$this -> Elements['sub']['set'] = self::MARC_PLACEHOLDER_SUBELMT;
 		}
 	}
 	
@@ -192,7 +132,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		$this -> DefaultOption = FALSE;
 		$this -> Content = FALSE;
 	}
-	
+
 	/**
 	 * sets default option
 	 *
@@ -203,9 +143,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 * @throws MarC_Exception if default value was not set
 	 * @throws MarC_Exception if default value was not set as string, integer or double
 	 *
-	 * @example Set_DefaultOption('example')
+	 * @example Set_DefaultOption('example'); to set that default value (marked with different style or so) will be "example"
 	 */
-	public function Set_DefaultOption($Value="")
+	public function Set_DefaultOption($Value)
 	{
 		try
 		{
@@ -216,7 +156,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -228,20 +168,19 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Value), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Value), MarC::Show_Options_Scalars());
 		}
 		
 		$this -> DefaultOption = $Value;
 	}
 	
 	/**
-	 * enables using of elements in order set in constructor in all code
-	 *
-	 * @return void
+	 * enables using of elements in order set in constructor in all code;
+	 * unusable for elements selecrt, optgroup, option - because it may lead to very unexpected results
 	 */
-	public function Set_EnableCorrectOrder()
+	public function Set_EnableSimpleOrder()
 	{
-		$this -> Enable_CorrectOrder = TRUE;
+		$this -> $Enable_SimpleOrder = TRUE;
 	}
 	
 	/**
@@ -256,7 +195,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 * @example Set_Content( array('a', 'b', 'c') );
 	 * @example Set_Content( array('a' => '1', 'b' => 2, 'c' => 3) );
 	 */
-	public function Set_Content($Content="")
+	public function Set_Content($Content)
 	{
 		try
 		{
@@ -267,7 +206,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__), gettype($Content), 'array');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Content), 'array');
 		}
 		
 		/*
@@ -292,9 +231,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 * @throws MarC_Exception if content was not prepared (at least empty)
 	 * @throws MarC_Exception if name or value was not set as string, integer or double
 	 *
-	 * @example Set_NewMainOption('example', 'code');
+	 * @example Set_NewMainOption('example', 'code'); to set that the first option in menu will be "code" with value "example"
 	 */
-	public function Set_NewMainOption($Name="", $Value="")
+	public function Set_NewMainOption($Name, $Value)
 	{
 		try
 		{
@@ -305,7 +244,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, "Set_FormContent");
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, "Set_Content");
 		}
 		
 		try
@@ -317,7 +256,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -329,7 +268,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 		
 		try
@@ -341,7 +280,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Name), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Name), MarC::Show_Options_Scalars());
 		}
 		
 		try
@@ -353,7 +292,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1], gettype($Value), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), gettype($Value), MarC::Show_Options_Scalars());
 		}
 		
 		/*
@@ -388,9 +327,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 * @throws MarC_Exception if order was not set greater than or equal to zero
 	 * @throws MarC_Exception if style name was not set
 	 *
-	 * @example Set_BottomLevelStyles(1, 'font-size', '2em');
+	 * @example Set_BottomLevelStyles(1, 'font-size', '2em'); the second option (without regard where it is) will get style "font-style" with value "2em", but in select dropdown it probably will not happen
 	 */
-	public function Set_SubLevelStyles($Order="", $Name="", $Value="")
+	public function Set_SubLevelStyles($Order, $Name, $Value="")
 	{
 		try
 		{
@@ -401,7 +340,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -413,7 +352,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Order), 'integer');
 		}
 		
 		try
@@ -425,7 +364,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), 0);
 		}
 		
 		try
@@ -437,10 +376,10 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 		
-		$this -> Set_SelectedElementStyles($Order, $this -> Elements['sub'], $Name, $Value);
+		$this -> Set_SelectedElementStyles($Order, $this -> Elements['sub']['set'], $Name, $Value);
 	}
 	
 	/**
@@ -459,7 +398,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 *
 	 * @example Set_BottomLevelAttributes(2, 'id', 'example');
 	 */
-	public function Set_SubLevelAttributes($Order="", $Name="", $Value="")
+	public function Set_SubLevelAttributes($Order, $Name, $Value="")
 	{
 		try
 		{
@@ -470,7 +409,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 	
 		try
@@ -482,7 +421,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Order), 'integer');
 		}
 	
 		try
@@ -494,7 +433,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), 0);
 		}
 	
 		try
@@ -506,10 +445,10 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 	
-		$this -> Set_SelectedElementAttributes($Order, $this -> Elements['sub'], $Name, $Value);
+		$this -> Set_SelectedElementAttributes($Order, $this -> Elements['sub']['set'], $Name, $Value);
 	}
 	
 	/**
@@ -528,7 +467,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 *
 	 * @example Set_MiddleLevelStyles(3, 'color', '#ABCDEF');
 	 */
-	public function Set_MiddleLevelStyles($Order="", $Name="", $Value="")
+	public function Set_MiddleLevelStyles($Order, $Name, $Value="")
 	{
 		try
 		{
@@ -539,7 +478,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 	
 		try
@@ -551,7 +490,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Order), 'integer');
 		}
 	
 		try
@@ -563,7 +502,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), 0);
 		}
 	
 		try
@@ -575,10 +514,10 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 	
-		$this -> Set_SelectedElementStyles($Order, $this -> Elements['mid'], $Name, $Value);
+		$this -> Set_SelectedElementStyles($Order, $this -> Elements['mid']['set'], $Name, $Value);
 	}
 	
 	/**
@@ -597,7 +536,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 *
 	 * @example Set_MiddleLevelAttributes(0, 'name', 'example');
 	 */
-	public function Set_MiddleLevelAttributes($Order="", $Name="", $Value="")
+	public function Set_MiddleLevelAttributes($Order, $Name, $Value="")
 	{
 		try
 		{
@@ -608,7 +547,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 	
 		try
@@ -620,7 +559,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Order), 'integer');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Order), 'integer');
 		}
 	
 		try
@@ -632,7 +571,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], 0);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), 0);
 		}
 	
 		try
@@ -644,10 +583,10 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 	
-		$this -> Set_SelectedElementAttributes($Order, $this -> Elements['mid'], $Name, $Value);
+		$this -> Set_SelectedElementAttributes($Order, $this -> Elements['mid']['set'], $Name, $Value);
 	}
 	
 	/**
@@ -662,7 +601,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 *
 	 * @example Set_TopLevelStyles('background-color', '#FEDCBA');
 	 */
-	public function Set_TopLevelStyles($Name="", $Value="")
+	public function Set_TopLevelStyles($Name, $Value="")
 	{
 		try
 		{
@@ -673,10 +612,10 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 	
-		$this -> Set_AllElementsStyles($this -> Elements['top'], $Name, $Value);
+		$this -> Set_AllElementsStyles($this -> Elements['top']['set'], $Name, $Value);
 	}
 	
 	/**
@@ -685,13 +624,11 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 * @param string $Name
 	 * @param string $Value
 	 *
-	 * @return void
-	 *
 	 * @throws MarC_Exception if attribute name was not set
 	 *
 	 * @example Set_TopLevelAttributes('id', 'example');
 	 */
-	public function Set_TopLevelAttributes($Name="", $Value="")
+	public function Set_TopLevelAttributes($Name, $Value="")
 	{
 		try
 		{
@@ -702,24 +639,20 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 	
-		$this -> Set_AllElementsAttributes($this -> Elements['top'], $Name, $Value);
+		$this -> Set_AllElementsAttributes($this -> Elements['top']['set'], $Name, $Value);
 	}
 	
 	/**
 	 * sets attribute that will be used like value in option
 	 *
-	 * @param string $Attribute
-	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if attribute name was not set
+	 * @param string $Attribute name of attribute
 	 *
 	 * @example Set_SubLevelContentAttribute('value');
 	 */
-	public function Set_SubLevelContentAttribute($Attribute="")
+	public function Set_SubLevelContentAttribute($Attribute)
 	{
 		try
 		{
@@ -730,22 +663,22 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
-		
+
 		$this -> SpecialAttributes['sub'] = $Attribute;
 	}
 	
 	/**
 	 * sets attribute that will be used like label in optgroup
 	 *
-	 * @param string $Attribute
+	 * @param string $Attribute name of attribute
 	 *
 	 * @throws MarC_Exception if attribute name was not set
 	 *
-	 * @example Set_MiddleLevelContentAttribute('option');
+	 * @example Set_MiddleLevelContentAttribute('label');
 	 */
-	public function Set_MiddleLevelContentAttribute($Attribute="")
+	public function Set_MiddleLevelContentAttribute($Attribute)
 	{
 		try
 		{
@@ -756,7 +689,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 		
 		$this -> SpecialAttributes['mid'] = $Attribute;
@@ -771,7 +704,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 *
 	 * @example Set_ChoiceAttribute('selected');
 	 */
-	public function Set_ChoiceAttribute($Attribute="")
+	public function Set_ChoiceAttribute($Attribute)
 	{
 		try
 		{
@@ -782,9 +715,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
-	
+
 		$this -> SpecialAttributes['chc'] = $Attribute;
 	}
 	
@@ -799,7 +732,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 *
 	 * @example Set_TopLevelValuesSeparator('class', ',');
 	 */
-	public function Set_TopLevelValuesSeparator($Attribute="", $Separator="")
+	public function Set_TopLevelValuesSeparator($Attribute, $Separator=MarC::MARC_OPTION_SPC)
 	{
 		try
 		{
@@ -810,22 +743,22 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
-		
+
 		try
 		{
-			if(empty($Separator))
+			if(in_array($Separator, MarC::Show_Options_ValuesSeparation()))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_ValuesSeparation());
 		}
 		
-		$this -> Set_SelectedValuesSeparators($this -> Elements['top'], $Attribute, $Separator);
+		$this -> Set_SelectedValuesSeparators($this -> Elements['top']['set'], $Attribute, $Separator);
 	}
 	
 	/**
@@ -839,7 +772,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 *
 	 * @example Set_MiddleLevelValuesSeparator('class', ',');
 	 */
-	public function Set_MiddleLevelValuesSeparator($Attribute="", $Separator="")
+	public function Set_MiddleLevelValuesSeparator($Attribute, $Separator=MarC::MARC_OPTION_SPC)
 	{
 		try
 		{
@@ -850,22 +783,22 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
-	
+
 		try
 		{
-			if(empty($Separator))
+			if(in_array($Separator, MarC::Show_Options_ValuesSeparation()))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_ValuesSeparation());
 		}
 	
-		$this -> Set_SelectedValuesSeparators($this -> Elements['mid'], $Attribute, $Separator);
+		$this -> Set_SelectedValuesSeparators($this -> Elements['mid']['set'], $Attribute, $Separator);
 	}
 	
 	/**
@@ -879,7 +812,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 *
 	 * @example Set_MiddleLevelValuesSeparator('class', ',');
 	 */
-	public function Set_SubLevelValuesSeparator($Attribute="", $Separator="")
+	public function Set_SubLevelValuesSeparator($Attribute, $Separator=MarC::MARC_OPTION_SPC)
 	{
 		try
 		{
@@ -890,22 +823,22 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
-	
+
 		try
 		{
-			if(empty($Separator))
+			if(in_array($Separator, MarC::Show_Options_ValuesSeparation()))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_ValuesSeparation());
 		}
 	
-		$this -> Set_SelectedValuesSeparators($this -> Elements['sub'], $Attribute, $Separator);
+		$this -> Set_SelectedValuesSeparators($this -> Elements['sub']['set'], $Attribute, $Separator);
 	}
 
 	/**
@@ -921,7 +854,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 * @throws MarC_Exception if level was not set
 	 * @throws MarC_Exception if array has more than two dimensions
 	 */
-	private function Check_Content($Content="", $Level="", $Item="")
+	private function Check_Content($Content, $Level, $Item="")
 	{
 		/*
 		 * higher number is not neccessary;
@@ -939,7 +872,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 		
 		try
@@ -951,7 +884,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[1]);
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1));
 		}
 		
 		try
@@ -963,7 +896,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_Parameters(__CLASS__, __FUNCTION__)[0], gettype($Content), 'array');
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Content), 'array');
 		}
 		
 		/*
@@ -1020,17 +953,17 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 				/*
 				 * support string
 				 */
-				$NoValue .= empty($MidLevel) ? md5($SubLevel) : md5($MidLevel);
+				$NoValue .= empty($MidLevel) ? strlen($SubLevel) : strlen($MidLevel);
 				
 				if(next($this -> Content) === FALSE || is_array(next($this -> Content)))
 				{
 					$Temp[$MidLevel] = $SubLevel;
-					$New[$NoValue] = $Temp;
-					$Temp = array();
 				}
 				else
 				{
 					$Temp[$MidLevel] = $SubLevel;
+					$New[$NoValue] = $Temp;
+					$Temp = array();
 				}
 			}
 		}
@@ -1045,6 +978,8 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 */
 	private function Get_AssembledCode_WithoutDefaultOption()
 	{
+		$this -> LocalCode = array();
+
 		/*
 		 * creation of empty select menu
 		 */
@@ -1053,15 +988,15 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 			/*
 			 * part 1
 			 */
-			$VMaX = new SimpleAssembler($this -> Elements['top'], $this -> Elements['mid']);
+			$VMaX = new SimpleAssembler($this -> Elements['top']['main'], $this -> Elements['mid']['main']);
 			
 			/*
 			 * part 2;
 			 * sets separator of attribute values
 			 */
-			if(isset($this -> ValuesSeparators_Selected[$this -> Elements['top']]))
+			if(isset($this -> ValuesSeparators_Selected[$this -> Elements['top']['set']]))
 			{
-				foreach($this -> ValuesSeparators_Selected[$this -> Elements['top']] as $Attribute => $Separator)
+				foreach($this -> ValuesSeparators_Selected[$this -> Elements['top']['set']] as $Attribute => $Separator)
 				{
 					$VMaX -> Set_ValuesSeparator($Attribute, $Separator);
 				}
@@ -1071,9 +1006,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 			 * part 3;
 			 * sets styles for top level
 			 */
-			if(isset($this -> ElementStyles_Global[$this -> Elements['top']]))
+			if(isset($this -> ElementStyles_Global[$this -> Elements['top']['set']]))
 			{
-				foreach($this -> ElementStyles_Global[$this -> Elements['top']] as $Name => $Value)
+				foreach($this -> ElementStyles_Global[$this -> Elements['top']['set']] as $Name => $Value)
 				{
 					$VMaX -> Set_TopLevelStyles($Name, $Value);
 				}
@@ -1083,9 +1018,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 			 * part 4;
 			 * sets attributes for top level
 			 */
-			if(isset($this -> ElementAttributes_Global[$this -> Elements['top']]))
+			if(isset($this -> ElementAttributes_Global[$this -> Elements['top']['set']]))
 			{
-				foreach($this -> ElementAttributes_Global[$this -> Elements['top']] as $Name => $Value)
+				foreach($this -> ElementAttributes_Global[$this -> Elements['top']['set']] as $Name => $Value)
 				{
 					$VMaX -> Set_TopLevelAttributes($Name, $Value);
 				}
@@ -1101,7 +1036,7 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 			$VMaX -> Set_DisableTopLevel();
 			$VMaX -> Set_Content();
 			$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
-			return $VMaX -> Execute();
+			$this -> LocalCode[] = $VMaX -> Execute();
 		}
 		/*
 		 * creation of filled select menu
@@ -1116,11 +1051,6 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 			$OrderSubLevel = 0;
 			$OrderMidLevel = 0;
 			
-			/*
-			 * retyping of variable that bears code
-			 */
-			$this -> LocalCode = array();
-			
 			foreach($this -> Content as $TopLevel => $MidLevel)
 			{
 				/*
@@ -1133,11 +1063,13 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * sets how content will be handled (key will be value of attribute value, value will be text wrapped in option);
 					 * setting has not effect on optgroup's attribute label
 					 */
-					$VMaX = new SimpleAssembler($this -> Elements['mid'], $this -> Elements['sub']);
+					$VMaX = new SimpleAssembler($this -> Elements['mid']['main'], $this -> Elements['sub']['main']);
+					$VMaX -> Set_Comment($this -> Elements['mid']['main'].' start', UniCAT::UNICAT_OPTION_ABOVE);
+					$VMaX -> Set_Comment($this -> Elements['mid']['main'].' end', UniCAT::UNICAT_OPTION_BELOW);
 					
 					if(isset($this -> SpecialAttributes['sub']))
 					{
-						$VMaX -> Set_ContentUsage(MarC::MARC_OPTION_ATTRIBUTEVALUE, MarC::MARC_OPTION_ELEMENTTEXT, $this -> SpecialAttributes['sub']);
+						$VMaX -> Set_ContentUsage(MarC::MARC_OPTION_ATTRVAL, MarC::MARC_OPTION_ELMTTEXT, $this -> SpecialAttributes['sub']);
 					}
 					
 					/*
@@ -1153,9 +1085,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 3;
 					 * sets separator of values of middle level attributes
 					 */
-					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['mid']]))
+					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['mid']['set']]))
 					{
-						foreach($this -> ValuesSeparators_Selected[$this -> Elements['mid']] as $Attribute => $Separator)
+						foreach($this -> ValuesSeparators_Selected[$this -> Elements['mid']['set']] as $Attribute => $Separator)
 						{
 							$VMaX -> Set_TopLevelValuesSeparator($Attribute, $Separator);
 						}
@@ -1165,9 +1097,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 4;
 					 * sets separator of values of sub level attributes
 					 */
-					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['sub']]))
+					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['sub']['set']]))
 					{
-						foreach($this -> ValuesSeparators_Selected[$this -> Elements['sub']] as $Attribute => $Separator)
+						foreach($this -> ValuesSeparators_Selected[$this -> Elements['sub']['set']] as $Attribute => $Separator)
 						{
 							$VMaX -> Set_SubLevelValuesSeparator($Attribute, $Separator);
 						}
@@ -1186,9 +1118,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 6;
 					 * sets styles for optgroup
 					 */
-					if(isset($this -> ElementStyles_Selected[$this -> Elements['mid']][$OrderMidLevel]))
+					if(isset($this -> ElementStyles_Selected[$this -> Elements['mid']['set']][$OrderMidLevel]))
 					{
-						foreach($this -> ElementStyles_Selected[$this -> Elements['mid']][$OrderMidLevel] as $Name => $Value)
+						foreach($this -> ElementStyles_Selected[$this -> Elements['mid']['set']][$OrderMidLevel] as $Name => $Value)
 						{
 							$VMaX -> Set_TopLevelStyles($Name, $Value);
 						}
@@ -1198,9 +1130,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 7;
 					 * sets attributes for optgroup
 					 */
-					if(isset($this -> ElementAttributes_Selected[$this -> Elements['mid']][$OrderMidLevel]))
+					if(isset($this -> ElementAttributes_Selected[$this -> Elements['mid']['set']][$OrderMidLevel]))
 					{
-						foreach($this -> ElementAttributes_Selected[$this -> Elements['mid']][$OrderMidLevel] as $Name => $Value)
+						foreach($this -> ElementAttributes_Selected[$this -> Elements['mid']['set']][$OrderMidLevel] as $Name => $Value)
 						{
 							$VMaX -> Set_TopLevelAttributes($Name, $Value);
 						}
@@ -1213,17 +1145,17 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 */
 					foreach($MidLevel as $Key => $Value)
 					{
-						if(isset($this -> ElementStyles_Selected[$this -> Elements['sub']][$OrderSubLevel]))
+						if(isset($this -> ElementStyles_Selected[$this -> Elements['sub']['set']][$OrderSubLevel]))
 						{
-							foreach($this -> ElementStyles_Selected[$this -> Elements['sub']][$OrderSubLevel] as $Name => $Value)
+							foreach($this -> ElementStyles_Selected[$this -> Elements['sub']['set']][$OrderSubLevel] as $Name => $Value)
 							{
 								$VMaX -> Set_SubLevelStyles($OrderOptions, $Name, $Value);
 							}
 						}
 						
-						if(isset($this -> ElementAttributes_Selected[$this -> Elements['sub']][$OrderSubLevel]))
+						if(isset($this -> ElementAttributes_Selected[$this -> Elements['sub']['set']][$OrderSubLevel]))
 						{
-							foreach($this -> ElementAttributes_Selected[$this -> Elements['sub']][$OrderSubLevel] as $Name => $Value)
+							foreach($this -> ElementAttributes_Selected[$this -> Elements['sub']['set']][$OrderSubLevel] as $Name => $Value)
 							{
 								$VMaX -> Set_SubLevelAttributes($OrderOptions, $Name, $Value);
 							}
@@ -1237,8 +1169,16 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * sets way how result will be exported;
 					 * code export
 					 */
-					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_SKIP);
-					$this -> LocalCode[] = $VMaX -> Execute();
+					if($TopLevel == array_keys($this -> Content)[count(array_keys($this -> Content))-1])
+					{
+						$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
+						$this -> LocalCode[] = $VMaX -> Execute();
+					}
+					else
+					{
+						$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_GOON);
+						$VMaX -> Execute();
+					}
 				}
 				/*
 				 * creation of options part of select menu
@@ -1250,14 +1190,14 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * sets how content will be handled (key will be value of attribute value, value will be text wrapped in option);
 					 * setting has not effect on optgroup's attribute label
 					 */
-					$VMaX = new SimpleAssembler( ($this -> Enable_CorrectOrder == FALSE ? $this -> Elements['mid'] : $this -> Elements['top'] ), ($this -> Enable_CorrectOrder == FALSE ? $this -> Elements['sub'] : $this -> Elements['mid'] ) );
+					$VMaX = new SimpleAssembler('', ($this -> Enable_SimpleOrder == FALSE ? $this -> Elements['sub']['main'] : $this -> Elements['mid']['main'] ) );
+					$VMaX -> Set_Comment(($this -> Enable_SimpleOrder == FALSE ? $this -> Elements['sub']['main'] : $this -> Elements['mid']['main'] ).' start', UniCAT::UNICAT_OPTION_ABOVE);
+					$VMaX -> Set_Comment(($this -> Enable_SimpleOrder == FALSE ? $this -> Elements['sub']['main'] : $this -> Elements['mid']['main'] ).' end', UniCAT::UNICAT_OPTION_BELOW);
 					
 					if(isset($this -> SpecialAttributes['sub']))
 					{
-						$VMaX -> Set_ContentUsage(MarC::MARC_OPTION_ATTRIBUTEVALUE, MarC::MARC_OPTION_ELEMENTTEXT, $this -> SpecialAttributes['sub']);
+						$VMaX -> Set_ContentUsage(MarC::MARC_OPTION_ATTRVAL, MarC::MARC_OPTION_ELMTTEXT, $this -> SpecialAttributes['sub']);
 					}
-					
-					$VMaX -> Set_DisableTopLevel();
 					
 					/*
 					 * part 2;
@@ -1272,9 +1212,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 3;
 					 * sets separator of values of sub level attributes
 					 */
-					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['mid']]))
+					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['mid']['set']]))
 					{
-						foreach($this -> ValuesSeparators_Selected[$this -> Elements['mid']] as $Attribute => $Separator)
+						foreach($this -> ValuesSeparators_Selected[$this -> Elements['mid']['set']] as $Attribute => $Separator)
 						{
 							$VMaX -> Set_TopLevelValuesSeparator($Attribute, $Separator);
 						}
@@ -1284,9 +1224,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 4;
 					 * sets separator of values of sub level attributes
 					 */
-					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['sub']]))
+					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['sub']['set']]))
 					{
-						foreach($this -> ValuesSeparators_Selected[$this -> Elements['sub']] as $Attribute => $Separator)
+						foreach($this -> ValuesSeparators_Selected[$this -> Elements['sub']['set']] as $Attribute => $Separator)
 						{
 							$VMaX -> Set_SubLevelValuesSeparator($Attribute, $Separator);
 						}
@@ -1299,17 +1239,17 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 */
 					foreach($MidLevel as $Key => $Value)
 					{
-						if(isset($this -> ElementStyles_Selected[$this -> Elements['sub']][$OrderSubLevel]))
+						if(isset($this -> ElementStyles_Selected[$this -> Elements['sub']['set']][$OrderSubLevel]))
 						{
-							foreach($this -> ElementStyles_Selected[$this -> Elements['sub']][$OrderSubLevel] as $Name => $Value)
+							foreach($this -> ElementStyles_Selected[$this -> Elements['sub']['set']][$OrderSubLevel] as $Name => $Value)
 							{
 								$VMaX -> Set_SubLevelStyles($OrderOptions, $Name, $Value);
 							}
 						}
 					
-						if(isset($this -> ElementAttributes_Selected[$this -> Elements['sub']][$OrderSubLevel]))
+						if(isset($this -> ElementAttributes_Selected[$this -> Elements['sub']['set']][$OrderSubLevel]))
 						{
-							foreach($this -> ElementAttributes_Selected[$this -> Elements['sub']][$OrderSubLevel] as $Name => $Value)
+							foreach($this -> ElementAttributes_Selected[$this -> Elements['sub']['set']][$OrderSubLevel] as $Name => $Value)
 							{
 								$VMaX -> Set_SubLevelAttributes($OrderOptions, $Name, $Value);
 							}
@@ -1324,8 +1264,16 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * set text wrapped in option element;
 					 * code export
 					 */
-					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
-					$this -> LocalCode[] = $VMaX -> Execute();
+					if($TopLevel == array_keys($this -> Content)[count(array_keys($this -> Content))-1])
+					{
+						$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
+						$this -> LocalCode[] = $VMaX -> Execute();
+					}
+					else
+					{
+						$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_GOON);
+						$VMaX -> Execute();
+					}
 					
 					$OrderSubLevel++;
 				}
@@ -1342,6 +1290,8 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 	 */
 	private function Get_AssembledCode_WithDefaultOption()
 	{
+		$this -> LocalCode = array();
+
 		/*
 		 * creation of empty select menu
 		 */
@@ -1350,15 +1300,15 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 			/*
 			 * part 1
 			 */
-			$VMaX = new SimpleAssembler($this -> Elements['top'], $this -> Elements['mid']);
+			$VMaX = new SimpleAssembler('', $this -> Elements['mid']['main']);
 				
 			/*
 			 * part 2;
 			 * sets separator of attribute values
 			*/
-			if(isset($this -> ValuesSeparators_Selected[$this -> Elements['top']]))
+			if(isset($this -> ValuesSeparators_Selected[$this -> Elements['top']['set']]))
 			{
-				foreach($this -> ValuesSeparators_Selected[$this -> Elements['top']] as $Attribute => $Separator)
+				foreach($this -> ValuesSeparators_Selected[$this -> Elements['top']['set']] as $Attribute => $Separator)
 				{
 					$VMaX -> Set_ValuesSeparator($Attribute, $Separator);
 				}
@@ -1368,9 +1318,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 			 * part 3;
 			 * sets styles for top level
 			 */
-			if(isset($this -> ElementStyles_Global[$this -> Elements['top']]))
+			if(isset($this -> ElementStyles_Global[$this -> Elements['top']['set']]))
 			{
-				foreach($this -> ElementStyles_Global[$this -> Elements['top']] as $Name => $Value)
+				foreach($this -> ElementStyles_Global[$this -> Elements['top']['set']] as $Name => $Value)
 				{
 					$VMaX -> Set_TopLevelStyles($Name, $Value);
 				}
@@ -1380,9 +1330,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 			 * part 4;
 			 * sets attributes for top level
 			 */
-			if(isset($this -> ElementAttributes_Global[$this -> Elements['top']]))
+			if(isset($this -> ElementAttributes_Global[$this -> Elements['top']['set']]))
 			{
-				foreach($this -> ElementAttributes_Global[$this -> Elements['top']] as $Name => $Value)
+				foreach($this -> ElementAttributes_Global[$this -> Elements['top']['set']] as $Name => $Value)
 				{
 					$VMaX -> Set_TopLevelAttributes($Name, $Value);
 				}
@@ -1395,10 +1345,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 			 * sets way how result will be exported;
 			 * code export
 			 */
-			$VMaX -> Set_DisableTopLevel();
 			$VMaX -> Set_Content();
 			$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
-			return $VMaX -> Execute();
+			$this -> LocalCode = $VMaX -> Execute();
 		}
 		/*
 		 * creation of filled select menu
@@ -1413,11 +1362,6 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 			$OrderSubLevel = 0;
 			$OrderMidLevel = 0;
 				
-			/*
-			 * retyping of variable that bears code
-			 */
-			$this -> LocalCode = array();
-				
 			foreach($this -> Content as $TopLevel => $MidLevel)
 			{
 				/*
@@ -1430,11 +1374,13 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * sets how content will be handled (key will be value of attribute value, value will be text wrapped in option);
 					 * setting has not effect on optgroup's attribute label
 					 */
-					$VMaX = new SimpleAssembler($this -> Elements['mid'], $this -> Elements['sub']);
+					$VMaX = new SimpleAssembler($this -> Elements['mid']['main'], $this -> Elements['sub']['main']);
+					$VMaX -> Set_Comment($this -> Elements['mid']['main'].' start', UniCAT::UNICAT_OPTION_ABOVE);
+					$VMaX -> Set_Comment($this -> Elements['mid']['main'].' end', UniCAT::UNICAT_OPTION_BELOW);
 						
 					if(isset($this -> SpecialAttributes['sub']))
 					{
-						$VMaX -> Set_ContentUsage(MarC::MARC_OPTION_ATTRIBUTEVALUE, MarC::MARC_OPTION_ELEMENTTEXT, $this -> SpecialAttributes['sub']);
+						$VMaX -> Set_ContentUsage(MarC::MARC_OPTION_ATTRVAL, MarC::MARC_OPTION_ELMTTEXT, $this -> SpecialAttributes['sub']);
 					}
 						
 					/*
@@ -1456,9 +1402,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 4;
 					 * sets separator of values of middle level attributes
 					 */
-					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['mid']]))
+					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['mid']['set']]))
 					{
-						foreach($this -> ValuesSeparators_Selected[$this -> Elements['mid']] as $Attribute => $Separator)
+						foreach($this -> ValuesSeparators_Selected[$this -> Elements['mid']['set']] as $Attribute => $Separator)
 						{
 							$VMaX -> Set_TopLevelValuesSeparator($Attribute, $Separator);
 						}
@@ -1468,9 +1414,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 5;
 					 * sets separator of values of sub level attributes
 					 */
-					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['sub']]))
+					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['sub']['set']]))
 					{
-						foreach($this -> ValuesSeparators_Selected[$this -> Elements['sub']] as $Attribute => $Separator)
+						foreach($this -> ValuesSeparators_Selected[$this -> Elements['sub']['set']] as $Attribute => $Separator)
 						{
 							$VMaX -> Set_SubLevelValuesSeparator($Attribute, $Separator);
 						}
@@ -1489,9 +1435,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 7;
 					 * sets styles for optgroup
 					 */
-					if(isset($this -> ElementStyles_Selected[$this -> Elements['mid']][$OrderMidLevel]))
+					if(isset($this -> ElementStyles_Selected[$this -> Elements['mid']['set']][$OrderMidLevel]))
 					{
-						foreach($this -> ElementStyles_Selected[$this -> Elements['mid']][$OrderMidLevel] as $Name => $Value)
+						foreach($this -> ElementStyles_Selected[$this -> Elements['mid']['set']][$OrderMidLevel] as $Name => $Value)
 						{
 							$VMaX -> Set_TopLevelStyles($Name, $Value);
 						}
@@ -1501,9 +1447,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 8;
 					 * sets attributes for optgroup
 					 */
-					if(isset($this -> ElementAttributes_Selected[$this -> Elements['mid']][$OrderMidLevel]))
+					if(isset($this -> ElementAttributes_Selected[$this -> Elements['mid']['set']][$OrderMidLevel]))
 					{
-						foreach($this -> ElementAttributes_Selected[$this -> Elements['mid']][$OrderMidLevel] as $Name => $Value)
+						foreach($this -> ElementAttributes_Selected[$this -> Elements['mid']['set']][$OrderMidLevel] as $Name => $Value)
 						{
 							$VMaX -> Set_TopLevelAttributes($Name, $Value);
 						}
@@ -1516,17 +1462,17 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 */
 					foreach($MidLevel as $Key => $Value)
 					{
-						if(isset($this -> ElementStyles_Selected[$this -> Elements['sub']][$OrderSubLevel]))
+						if(isset($this -> ElementStyles_Selected[$this -> Elements['sub']['set']][$OrderSubLevel]))
 						{
-							foreach($this -> ElementStyles_Selected[$this -> Elements['sub']][$OrderSubLevel] as $Name => $Value)
+							foreach($this -> ElementStyles_Selected[$this -> Elements['sub']['set']][$OrderSubLevel] as $Name => $Value)
 							{
 								$VMaX -> Set_SubLevelStyles($OrderOptions, $Name, $Value);
 							}
 						}
 	
-						if(isset($this -> ElementAttributes_Selected[$this -> Elements['sub']][$OrderSubLevel]))
+						if(isset($this -> ElementAttributes_Selected[$this -> Elements['sub']['set']][$OrderSubLevel]))
 						{
-							foreach($this -> ElementAttributes_Selected[$this -> Elements['sub']][$OrderSubLevel] as $Name => $Value)
+							foreach($this -> ElementAttributes_Selected[$this -> Elements['sub']['set']][$OrderSubLevel] as $Name => $Value)
 							{
 								$VMaX -> Set_SubLevelAttributes($OrderOptions, $Name, $Value);
 							}
@@ -1549,8 +1495,16 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * sets way how result will be exported;
 					 * code export
 					 */
-					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_SKIP);
-					$this -> LocalCode[] = $VMaX -> Execute();
+					if($TopLevel == array_keys($this -> Content)[count(array_keys($this -> Content))-1])
+					{
+						$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
+						$this -> LocalCode = $VMaX -> Execute();
+					}
+					else
+					{
+						$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_GOON);
+						$VMaX -> Execute();
+					}
 				}
 				/*
 				 * creation of options part of select menu
@@ -1562,14 +1516,14 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * sets how content will be handled (key will be value of attribute value, value will be text wrapped in option);
 					 * setting has not effect on optgroup's attribute label
 					 */
-					$VMaX = new SimpleAssembler( ($this -> Enable_CorrectOrder == FALSE ? $this -> Elements['mid'] : $this -> Elements['top'] ), ($this -> Enable_CorrectOrder == FALSE ? $this -> Elements['sub'] : $this -> Elements['mid'] ) );
+					$VMaX = new SimpleAssembler('', ($this -> Enable_SimpleOrder == FALSE ? $this -> Elements['sub']['main'] : $this -> Elements['mid']['main'] ) );
+					$VMaX -> Set_Comment(($this -> Enable_SimpleOrder == FALSE ? $this -> Elements['sub']['main'] : $this -> Elements['mid']['main'] ).' start', UniCAT::UNICAT_OPTION_ABOVE);
+					$VMaX -> Set_Comment(($this -> Enable_SimpleOrder == FALSE ? $this -> Elements['sub']['main'] : $this -> Elements['mid']['main'] ).' end', UniCAT::UNICAT_OPTION_BELOW);
 						
 					if(isset($this -> SpecialAttributes['sub']))
 					{
 						$VMaX -> Set_ContentUsage(MarC::MARC_OPTION_ATTRIBUTEVALUE, MarC::MARC_OPTION_ELEMENTTEXT, $this -> SpecialAttributes['sub']);
 					}
-						
-					$VMaX -> Set_DisableTopLevel();
 						
 					/*
 					 * part 2;
@@ -1590,9 +1544,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 4;
 					 * sets separator of values of sub level attributes
 					 */
-					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['mid']]))
+					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['mid']['set']]))
 					{
-						foreach($this -> ValuesSeparators_Selected[$this -> Elements['mid']] as $Attribute => $Separator)
+						foreach($this -> ValuesSeparators_Selected[$this -> Elements['mid']['set']] as $Attribute => $Separator)
 						{
 							$VMaX -> Set_TopLevelValuesSeparator($Attribute, $Separator);
 						}
@@ -1602,9 +1556,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * part 5;
 					 * sets separator of values of sub level attributes
 					 */
-					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['sub']]))
+					if(isset($this -> ValuesSeparators_Selected[$this -> Elements['sub']['set']]))
 					{
-						foreach($this -> ValuesSeparators_Selected[$this -> Elements['sub']] as $Attribute => $Separator)
+						foreach($this -> ValuesSeparators_Selected[$this -> Elements['sub']['set']] as $Attribute => $Separator)
 						{
 							$VMaX -> Set_SubLevelValuesSeparator($Attribute, $Separator);
 						}
@@ -1617,17 +1571,17 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 */
 					foreach($MidLevel as $Key => $Value)
 					{
-						if(isset($this -> ElementStyles_Selected[$this -> Elements['sub']][$OrderSubLevel]))
+						if(isset($this -> ElementStyles_Selected[$this -> Elements['sub']['set']][$OrderSubLevel]))
 						{
-							foreach($this -> ElementStyles_Selected[$this -> Elements['sub']][$OrderSubLevel] as $Name => $Value)
+							foreach($this -> ElementStyles_Selected[$this -> Elements['sub']['set']][$OrderSubLevel] as $Name => $Value)
 							{
 								$VMaX -> Set_SubLevelStyles($OrderSubLevel, $Name, $Value);
 							}
 						}
 							
-						if(isset($this -> ElementAttributes_Selected[$this -> Elements['sub']][$OrderSubLevel]))
+						if(isset($this -> ElementAttributes_Selected[$this -> Elements['sub']['set']][$OrderSubLevel]))
 						{
-							foreach($this -> ElementAttributes_Selected[$this -> Elements['sub']][$OrderSubLevel] as $Name => $Value)
+							foreach($this -> ElementAttributes_Selected[$this -> Elements['sub']['set']][$OrderSubLevel] as $Name => $Value)
 							{
 								$VMaX -> Set_SubLevelAttributes($OrderSubLevel, $Name, $Value);
 							}
@@ -1651,8 +1605,16 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 					 * set text wrapped in option element;
 					 * code export
 					 */
-					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
-					$this -> LocalCode[] = $VMaX -> Execute();
+					if($TopLevel == array_keys($this -> Content)[count(array_keys($this -> Content))-1])
+					{
+						$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
+						$this -> LocalCode[] = $VMaX -> Execute();
+					}
+					else
+					{
+						$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_GOON);
+						$VMaX -> Execute();
+					}
 						
 					$OrderSubLevel++;
 				}
@@ -1702,15 +1664,16 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		/*
 		 * part 1
 		 */
-		$VMaX = new CodeGenerator($this -> Elements['top']);
+		$VMaX = new CodeGenerator($this -> Elements['top']['main']);
+		$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_SKIP);
 		
 		/*
 		 * part 2;
 		 * sets separator of attribute values
 		 */
-		if(isset($this -> ValuesSeparators_Selected[$this -> Elements['top']]))
+		if(isset($this -> ValuesSeparators_Selected[$this -> Elements['top']['set']]))
 		{
-			foreach($this -> ValuesSeparators_Selected[$this -> Elements['top']] as $Attribute => $Separator)
+			foreach($this -> ValuesSeparators_Selected[$this -> Elements['top']['set']] as $Attribute => $Separator)
 			{
 				$VMaX -> Set_ValuesSeparator($Attribute, $Separator);
 			}
@@ -1720,9 +1683,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		 * part 3;
 		 * sets styles
 		 */
-		if(isset($this -> ElementStyles_Global[$this -> Elements['top']]))
+		if(isset($this -> ElementStyles_Global[$this -> Elements['top']['set']]))
 		{
-			foreach($this -> ElementStyles_Global[$this -> Elements['top']] as $Name => $Value)
+			foreach($this -> ElementStyles_Global[$this -> Elements['top']['set']] as $Name => $Value)
 			{
 				$VMaX -> Set_Style($Name, $Value);
 			}
@@ -1732,9 +1695,9 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		 * part 4;
 		 * sets attributes
 		 */
-		if(isset($this -> ElementAttributes_Global[$this -> Elements['top']]))
+		if(isset($this -> ElementAttributes_Global[$this -> Elements['top']['set']]))
 		{
-			foreach($this -> ElementAttributes_Global[$this -> Elements['top']] as $Name => $Value)
+			foreach($this -> ElementAttributes_Global[$this -> Elements['top']['set']] as $Name => $Value)
 			{
 				$VMaX -> Set_Attribute($Name, $Value);
 			}
@@ -1760,16 +1723,15 @@ class DualAssembler extends ElementListSetting implements I_MarC_Options_Content
 		 * part 6;
 		 * sets how code will be exported
 		 */
-		$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_SKIP);
 		$this -> LocalCode = $VMaX -> Execute();
-		
+
 		/*
 		 * sets how code will be exported;
 		 * final exporting of generated code
 		 */
 		MarC::Set_ExportWay(static::$ExportWay);
 		MarC::Add_Comments($this -> LocalCode, static::$Comments);
-		MarC::Convert_Code($this -> LocalCode, __CLASS__);
+		return MarC::Convert_Code($this -> LocalCode, __CLASS__);
 	}
 }
 

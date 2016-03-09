@@ -24,7 +24,7 @@ final class RowAssembler_Div extends SimpleAssembler
 	 */
 	public function __construct()
 	{
-		parent::__construct( array('div', 'div'), array('div', 'span') );
+		parent::__construct('div', 'div');
 		$this -> Set_Comment('row start', UniCAT::UNICAT_OPTION_ABOVE);
 		$this -> Set_Comment('row end', UniCAT::UNICAT_OPTION_BELOW);
 	}
