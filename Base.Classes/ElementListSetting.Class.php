@@ -23,7 +23,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	/**
 	 * list of elements got from DTD file;
 	 * form of each item:
-	 * [ElementName] => array(  [ClosingPart] = '/ElementName',
+	 * [ElementName] => array(	[ClosingPart] = '/ElementName',
 	 *			    			[Siblings] = EMPTY|#PCDATA|array(.,.,.)
 	 * );
 	 *
@@ -60,8 +60,8 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * @param string $Method name of function
 	 * @param array $Parameters function's parameters
 	 * 
-	 * @throws UniCAT_Exception if function does not exist
-	 * @throws UniCAT_Exception if function is not public
+	 * @throws MarC_Exception if function does not exist
+	 * @throws MarC_Exception if function is not public
 	 */
 	public function __call($Method, $Parameters)
 	{
@@ -75,12 +75,12 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 				}
 				else
 				{
-					throw new UniCAT_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_SEC_FNC_PRHBUSE1);
+					throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_SEC_FNC_PRHBUSE1);
 				}
 			}
 			else
 			{
-				throw new UniCAT_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_SEC_FNC_MISSING1);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_SEC_FNC_MISSING1);
 			}
 		}
 		catch(UniCAT_Exception $Exception)

@@ -54,6 +54,7 @@ require_once MARC_ADR.'Base.Classes/CodeGenerator.Class.php';
  * Advanced classes (Adv.Classes);
  * classes for generation of (not-only) larger code blocks
  */
+require_once MARC_ADR.'Adv.Classes/SingleElement.Class.php';
 require_once MARC_ADR.'Adv.Classes/SimpleAssembler.Class.php';
 require_once MARC_ADR.'Adv.Classes/UniqueAssembler.Class.php';
 require_once MARC_ADR.'Adv.Classes/DualAssembler.Class.php';

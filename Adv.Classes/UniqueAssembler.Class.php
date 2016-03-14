@@ -203,7 +203,7 @@ class UniqueAssembler extends ElementListSetting
 		{
 			try
 			{
-				if(preg_match('/(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute|ValuesSeparator)/i', $Method, $Parts))
+				if(preg_match('/Set_(?<Element>[A-Za-z]+)_(?<Order>Style|Attribute|ValuesSeparator)/i', $Method, $Parts))
 				{
 					try
 					{
@@ -293,7 +293,7 @@ class UniqueAssembler extends ElementListSetting
 	}
 	
 	/**
-	 * allows using of namespaced elements - because _call is not designed to use namespacewd elements directly;
+	 * allows using of namespaced elements - because __call is not designed to use namespaced elements directly;
 	 * it is not allowed to combine namespaces
 	 *
 	 * @return void

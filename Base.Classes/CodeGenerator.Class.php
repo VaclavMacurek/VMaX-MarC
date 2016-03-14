@@ -800,17 +800,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 				$this -> LocalCode = preg_replace('/([\t]*)\<'.$IndentedElement.'\>/', '<'.$IndentedElement.'>', $this -> LocalCode);
 			
 				$this -> LocalCode = preg_replace('/([\t]*)\<\/'.$IndentedElement.'\>/', '</'.$IndentedElement.'>', $this -> LocalCode);
-			
-				if(preg_match_all('/\<'.$IndentedElement.'([^\<\>]*)\>(.*)\<\/'.$IndentedElement.'\>/s', $this -> LocalCode, $Text, PREG_SET_ORDER))
-				{
-					$Text = preg_replace('/[\t]/', '', $Text[0][2]);
-				}
-				
-				if(in_array($IndentedElement, self::$List_UsedElements))
-				{
-					$Code = preg_replace('/\<'.$IndentedElement.'([^\<\>]*)\>(.*)\<\/'.$IndentedElement.'\>/s', '<'.$IndentedElement.'$1>'.$Text.'</'.$IndentedElement.'>', $this -> LocalCode);
-				}
-			}
+  			}
 		}
 		
 		/*
