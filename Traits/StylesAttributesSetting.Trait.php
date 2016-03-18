@@ -162,26 +162,26 @@ trait StylesAttributesSetting
 	{
 		try
 		{
-			if(count($this -> List_UsedOrders) > count($this -> Content))
+			if(count($this -> UsedOrders) > count($this -> Content))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_VAR, UniCAT::UNICAT_XCPT_SEC_VAR_PRHBGTRARRSIZE);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_VariableNameAsText($this -> List_UsedOrders), count($this -> Content));
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, $Exception -> Get_VariableNameAsText($this -> UsedOrders), count($this -> Content));
 		}
 	
 		try
 		{
-			if(!empty($this -> List_UsedOrders) && max($this -> List_UsedOrders) > count($this -> Content)-1)
+			if(!empty($this -> UsedOrders) && max($this -> UsedOrders) > count($this -> Content)-1)
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_VAR, UniCAT::UNICAT_XCPT_SEC_VAR_PRHBGTRARRSIZE);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), $Exception -> Get_VariableNameAsText($this -> List_UsedOrders), count($this -> Content));
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), $Exception -> Get_VariableNameAsText($this -> UsedOrders), count($this -> Content));
 		}
 	}
 	
@@ -225,9 +225,9 @@ trait StylesAttributesSetting
 		 * avoids unneccessary multiple appearance of the same order;
 		 * adds order to list
 		 */
-		if(!in_array($Order, $this -> List_UsedOrders))
+		if(!in_array($Order, $this -> UsedOrders))
 		{
-			$this -> List_UsedOrders[] = $Order;
+			$this -> UsedOrders[] = $Order;
 		}
 	}
 	

@@ -30,7 +30,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * @static
 	 * @var array
 	 */
-	protected static $List_AvailableElements = array();
+	protected static $AvailableElements = array();
 	
 	/**
 	 * direct access for function Set_ElementList
@@ -139,7 +139,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_Booleans());
 		}
 		
-		self::$List_AvailableElements = ($ResetList === TRUE) ? array() : self::$List_AvailableElements;		
+		self::$AvailableElements = ($ResetList === TRUE) ? array() : self::$AvailableElements;		
 		
 		$this -> Get_ElementList($File);
 	}
@@ -202,20 +202,20 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		switch($Siblings)
 		{
 			case MarC::MARC_OPTION_ANY:
-				self::$List_AvailableElements[$Open]['ClosingPart'] = '/'.$Open;
-				self::$List_AvailableElements[$Open]['Siblings'] = array_keys(self::$List_AvailableElements);
+				self::$AvailableElements[$Open]['ClosingPart'] = '/'.$Open;
+				self::$AvailableElements[$Open]['Siblings'] = array_keys(self::$AvailableElements);
 				break;
 			case MarC::MARC_OPTION_EMPTY:
-				self::$List_AvailableElements[$Open]['ClosingPart'] = $Open;
-				self::$List_AvailableElements[$Open]['Siblings'] = MarC::MARC_OPTION_EMPTY;
+				self::$AvailableElements[$Open]['ClosingPart'] = $Open;
+				self::$AvailableElements[$Open]['Siblings'] = MarC::MARC_OPTION_EMPTY;
 				break;
 			case MarC::MARC_OPTION_ONLYTEXT:
-				self::$List_AvailableElements[$Open]['ClosingPart'] = '/'.$Open;
-				self::$List_AvailableElements[$Open]['Siblings'] = MarC::MARC_OPTION_ONLYTEXT;
+				self::$AvailableElements[$Open]['ClosingPart'] = '/'.$Open;
+				self::$AvailableElements[$Open]['Siblings'] = MarC::MARC_OPTION_ONLYTEXT;
 				break;
 			default:
-				self::$List_AvailableElements[$Open]['ClosingPart'] = '/'.$Open;
-				self::$List_AvailableElements[$Open]['Siblings'] = $Siblings;
+				self::$AvailableElements[$Open]['ClosingPart'] = '/'.$Open;
+				self::$AvailableElements[$Open]['Siblings'] = $Siblings;
 				break;
 		}
 	}
@@ -255,7 +255,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 
 		try
 		{
-			if(count($Elements) == 1 && !is_array($Elements) && !array_key_exists($Elements[0], self::$List_AvailableElements))
+			if(count($Elements) == 1 && !is_array($Elements) && !array_key_exists($Elements[0], self::$AvailableElements))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_PRHBOPTION, MarC::MARC_XCPT_XPLN_DTDFILE);
 			}
@@ -271,17 +271,17 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 			{
 				if(!is_array($Elements[$Index]))
 				{
-					if(!array_key_exists($Elements[$Index], self::$List_AvailableElements))
+					if(!array_key_exists($Elements[$Index], self::$AvailableElements))
 					{
 						$Error = 1;
 						break;
 					}
-					elseif(isset($Elements[$Index-1]) && !is_array(self::$List_AvailableElements[$Elements[$Index-1]]['Siblings']))
+					elseif(isset($Elements[$Index-1]) && !is_array(self::$AvailableElements[$Elements[$Index-1]]['Siblings']))
 					{
 						$Error = 2;
 						break;
 					}
-					elseif(isset($Elements[$Index-1]) && !in_array($Elements[$Index], self::$List_AvailableElements[$Elements[$Index-1]]['Siblings']))
+					elseif(isset($Elements[$Index-1]) && !in_array($Elements[$Index], self::$AvailableElements[$Elements[$Index-1]]['Siblings']))
 					{
 						$Error = 3;
 						break;
@@ -289,7 +289,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 				}
 				elseif(is_array($Elements[$Index] && isset($Elements[$Index-1])))
 				{
-					if(array_intersect($Elements[$Index], self::$List_AvailableElements[$Elements[$Index-1]]['Siblings']) != $Elements[$Index])
+					if(array_intersect($Elements[$Index], self::$AvailableElements[$Elements[$Index-1]]['Siblings']) != $Elements[$Index])
 					{
 						$Error = 4;
 						break;
@@ -297,7 +297,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 				}
 				else
 				{
-					if(array_intersect($Elements[$Index], array_keys(self::$List_AvailableElements)) != $Elements[$Index])
+					if(array_intersect($Elements[$Index], array_keys(self::$AvailableElements)) != $Elements[$Index])
 					{
 						$Error = 1;
 						break;
@@ -326,7 +326,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 			}
 			elseif(in_array($Error, range(2, 4)))
 			{
-				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), self::$List_AvailableElements[$Elements[0]]['Siblings']);
+				$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), self::$AvailableElements[$Elements[0]]['Siblings']);
 			}
 		}
 	}
@@ -365,8 +365,8 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		 */
 		foreach ($Elements as $Element)
 		{
-			self::$List_AvailableElements[$Element['ElementName']]['ClosingPart'] = ($Element['ElementSetting'] == MarC::MARC_OPTION_EMPTY) ? $Element['ElementName'] : '/'.$Element['ElementName'];
-			self::$List_AvailableElements[$Element['ElementName']]['Siblings'] = $this -> Get_Siblings($Element['ElementSetting'], $Entities);
+			self::$AvailableElements[$Element['ElementName']]['ClosingPart'] = ($Element['ElementSetting'] == MarC::MARC_OPTION_EMPTY) ? $Element['ElementName'] : '/'.$Element['ElementName'];
+			self::$AvailableElements[$Element['ElementName']]['Siblings'] = $this -> Get_Siblings($Element['ElementSetting'], $Entities);
 		}
 	}
 	

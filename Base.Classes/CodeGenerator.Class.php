@@ -34,13 +34,6 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 */
 	private $Text = array();
 	/**
-	 * list of used elements;
-	 * useful for disabling of indention of chosen elements
-	 *
-	 * @var array
-	 */
-	private static $List_UsedElements = array();
-	/**
 	 * disables insertion of line-break inside element;
 	 * useful for usage of textarea
 	 *
@@ -92,7 +85,6 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		 */
 				if($this -> Check_ElementTreeValidity($Element))
 				{
-					self::$List_UsedElements[] = $Element;
 					$this -> Element = $Element;
 				}
 			}
@@ -102,11 +94,11 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
 
-		if(is_array(self::$List_AvailableElements[$this -> Element]['Siblings']) && in_array('#PCDATA', self::$List_AvailableElements[$this -> Element]['Siblings']))
+		if(is_array(self::$AvailableElements[$this -> Element]['Siblings']) && in_array('#PCDATA', self::$AvailableElements[$this -> Element]['Siblings']))
 		{
 			$this -> Enable_OneLineElement = TRUE;
 		}
-		elseif(!is_array(self::$List_AvailableElements[$this -> Element]['Siblings']) && self::$List_AvailableElements[$this -> Element]['Siblings'] == '#PCDATA')
+		elseif(!is_array(self::$AvailableElements[$this -> Element]['Siblings']) && self::$AvailableElements[$this -> Element]['Siblings'] == '#PCDATA')
 		{
 			$this -> Enable_OneLineElement = TRUE;
 		}
@@ -400,7 +392,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	{
 		try
 		{
-			if(self::$List_AvailableElements[$this -> Element]['Siblings'] == 'EMPTY' && $this -> Enable_InLineElement == FALSE)
+			if(self::$AvailableElements[$this -> Element]['Siblings'] == 'EMPTY' && $this -> Enable_InLineElement == FALSE)
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_VAR, UniCAT::UNICAT_XCPT_SEC_VAR_DMDFUNCTION2);
 			}
@@ -424,7 +416,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 
 		try
 		{
-			if(preg_match(MarC::MARC_XPSN_PSNELMT_GNRDCODE, $Text) && self::$List_AvailableElements[$this -> Element]['Siblings'] == MarC::MARC_OPTION_DATA)
+			if(preg_match(MarC::MARC_XPSN_PSNELMT_GNRDCODE, $Text) && self::$AvailableElements[$this -> Element]['Siblings'] == MarC::MARC_OPTION_DATA)
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_PRHBOPTION, MarC::MARC_XCPT_XPLN_DTDFILE);
 			}
@@ -491,7 +483,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 */
 	private function Convert_PrepareText()
 	{
-		if(self::$List_AvailableElements[$this -> Element]['Siblings'] == MarC::MARC_OPTION_EMPTY)
+		if(self::$AvailableElements[$this -> Element]['Siblings'] == MarC::MARC_OPTION_EMPTY)
 		{
 			switch($this -> Enable_InLineElement)
 			{
@@ -691,18 +683,18 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 			$AttributesStyles = "";
 		}
 
-		if(self::$List_AvailableElements[$this -> Element]['Siblings'] != MarC::MARC_OPTION_EMPTY)
+		if(self::$AvailableElements[$this -> Element]['Siblings'] != MarC::MARC_OPTION_EMPTY)
 		{
 			switch($this -> Enable_InLineElement)
 			{
 				case self::MARC_OPTION_LEFT:
-					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$List_AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
+					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
 				case self::MARC_OPTION_RIGHT:
-					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$List_AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
+					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
 				case self::MARC_OPTION_BOTH:
-					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$List_AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
+					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
 				default:
-					return sprintf($Form, $this -> Element, $AttributesStyles, $Text[0], self::$List_AvailableElements[$this -> Element]['ClosingPart']);
+					return sprintf($Form, $this -> Element, $AttributesStyles, $Text[0], self::$AvailableElements[$this -> Element]['ClosingPart']);
 			}
 		}
 		else
@@ -744,7 +736,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		/*
 		 * detection of closed/empty element
 		 */
-		$IsClosedElement = (self::$List_AvailableElements[$this -> Element]['Siblings'] != MarC::MARC_OPTION_EMPTY) ? TRUE : FALSE;
+		$IsClosedElement = (self::$AvailableElements[$this -> Element]['Siblings'] != MarC::MARC_OPTION_EMPTY) ? TRUE : FALSE;
 		
 		try
 		{

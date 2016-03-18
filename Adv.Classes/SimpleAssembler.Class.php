@@ -26,7 +26,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	 *
 	 * @var array
 	 */
-	protected $List_UsedOrders = array();
+	protected $UsedOrders = array();
 	/**
 	 * disables wrapping code into top level element
 	 */
@@ -126,7 +126,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 	{
 		$this -> Content = array();
 		$this -> ContentUsage = array();
-		$this -> List_UsedOrders = array();
+		$this -> UsedOrders = array();
 		$this -> Disable_TopLevel = FALSE;
 	}
 
@@ -777,7 +777,7 @@ class SimpleAssembler extends ElementListSetting implements I_MarC_Options_Conte
 			 * sets text wrapped by element of sub-level;
 			 * automatically detects empty elements
 			 */
-			if(self::$List_AvailableElements[$this -> Elements['sub']['main']]['Siblings'] != 'EMPTY')
+			if(self::$AvailableElements[$this -> Elements['sub']['main']]['Siblings'] != 'EMPTY')
 			{
 				$VMaX -> Set_Text((empty($this -> Content[$Order]) ? '' : $this -> Content[$Order]));
 			}

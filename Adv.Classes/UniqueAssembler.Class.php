@@ -26,7 +26,7 @@ class UniqueAssembler extends ElementListSetting
 	 *
 	 * @var array
 	 */
-	protected $List_UsedOrders = array();
+	protected $UsedOrders = array();
 	/**
 	 * disables wrapping code into top level element
 	 */
@@ -174,7 +174,7 @@ class UniqueAssembler extends ElementListSetting
 	public function __destruct()
 	{
 		$this -> Content = array();
-		$this -> List_UsedOrders = array();
+		$this -> UsedOrders = array();
 		$this -> Disable_TopLevel = FALSE;
 	}
 	
@@ -418,7 +418,7 @@ class UniqueAssembler extends ElementListSetting
 			 * sets text wrapped by element of sub-level;
 			 * automatically detects empty elements
 			 */
-			if(self::$List_AvailableElements[$this -> Elements['sub'][$Order]]['Siblings'] != 'EMPTY')
+			if(self::$AvailableElements[$this -> Elements['sub'][$Order]]['Siblings'] != 'EMPTY')
 			{
 				$VMaX -> Set_Text((empty($this -> Content[$Order]) ? '' : $this -> Content[$Order] ));
 			}
