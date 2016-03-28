@@ -19,24 +19,22 @@ use UniCAT\ClassScope;
  *
  * class for easier access to class constants of interfaces
  *
- * @method array Show_Options_ContentUsage(); show options how content will be used (if it will be text or attribute)
- * @method array Show_Options_ValuesSeparation(); show options for separators of values in attributes
- * @method array Show_Options_ElementSetting(); show options for setting of element siblings
- * @method array Show_Options_InLineSetting(); show options for setting of position of text for in-line element
- * @method array Show_Options_CodeHeading(); show options for code headings (if it will be xml header of DTD header)
+ * @method array ShowOptions_ContentUsage(); show options how content will be used (if it will be text or attribute)
+ * @method array ShowOptions_ValuesSeparation(); show options for separators of values in attributes
+ * @method array ShowOptions_ElementSetting(); show options for setting of element siblings
+ * @method array ShowOptions_InLineSetting(); show options for setting of position of text for in-line element
+ * @method array ShowOptions_CodeHeading(); show options for code headings (if it will be xml header of DTD header)
  */
 final class MarC extends UniCAT implements I_MarC_Expressions_Union, I_MarC_Options_Union, I_MarC_Texts_Union, I_MarC_Exceptions
 {
-	use CodeExport, CodeMemory, Comments, ConditionalComments,
-	InstanceOptions
+	use CodeExport, CodeMemory, Comments, ConditionalComments, InstanceOptions
 	{
 		Set_Instance as public;
+		Set_Comment as private;
 	}
 	
 	/**
 	 * prepares lists of options
-	 *
-	 * @return void
 	 */
 	public function __construct()
 	{

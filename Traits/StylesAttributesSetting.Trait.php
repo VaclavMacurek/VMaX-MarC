@@ -58,6 +58,12 @@ trait StylesAttributesSetting
 	 */
 	protected $ValuesSeparators_Selected = array();
 	/**
+	 * list of orders - used to check if all stylea and attributes were set correctly
+	 *
+	 * @var array
+	 */
+	protected $UsedOrders = array();
+	/**
 	 * controls usage of attributes without values;
 	 * useful for JavaScript features
 	 *
@@ -66,16 +72,15 @@ trait StylesAttributesSetting
 	protected static $Enable_NoValueAttributes = FALSE;
 	
 	/**
-	 * checks if name of style is correct
+	 * checks if style name is correct
 	 *
-	 * @param string $Name
+	 * @param string $Name element name
 	 *
-	 * @return boolean
+	 * @return TRUE TRUE if style name is corrected; else exception is throwed
 	 *
-	 * @throws MarC_Exception if style name was not set
-	 * @throws MarC_Exception if stylename does not match pattern of style name
+	 * @throws MarC_Exception
 	 *
-	 * @example Check_StyleName('font-family');
+	 * @example Check_StyleName('font-family'); to check style name "font-family"
 	 */
 	protected function Check_StyleName($Name)
 	{
@@ -109,16 +114,15 @@ trait StylesAttributesSetting
 	}
 	
 	/**
-	 * checks if name of attribute is correct
+	 * checks if attribute name is correct
 	 *
-	 * @param string $Name
+	 * @param string $Name attribute name
 	 *
-	 * @return boolean
+	 * @return TRUE TRUE if style name is corrected; else exception is throwed
 	 *
-	 * @throws MarC_Exception if attribute name was not set
-	 * @throws MarC_Exception if attribute name does not match pattern of attribute name
+	 * @throws MarC_Exception
 	 *
-	 * @example Check_AttributeName('id');
+	 * @example Check_AttributeName('id'); to check attribute name "id"
 	 */
 	protected function Check_AttributeName($Name)
 	{
@@ -154,9 +158,7 @@ trait StylesAttributesSetting
 	/**
 	 * checks if order of styled/attributed items was set correctly
 	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if order (number index of appearance of used element in block) was not set
+	 * @throws MarC_Exception
 	 */
 	protected function Check_Orders()
 	{
@@ -186,14 +188,11 @@ trait StylesAttributesSetting
 	}
 	
 	/**
-	 * adds number of order to list of used ordwers - for purpose of control which orders were used
+	 * adds number of order to list of used orders - for purpose of control which orders were used
 	 *
-	 * @return void
+	 * @throws MarC_Exception
 	 *
-	 * @throws MarC_Exception if order (number index of appearance of used element in block) was not set
-	 * @throws MarC_Exception if order (number index of appearance of used element in block) was not set as integer
-	 *
-	 * @example Set_OrderToList(1);
+	 * @example Set_OrderToList(1); to set that order 1 was used (the second element got attribute or style)
 	 */
 	protected function Set_OrderToList($Order="")
 	{
@@ -234,16 +233,13 @@ trait StylesAttributesSetting
 	/**
 	 * sets style for global setting of styles and attributes
 	 *
-	 * @param string $Element
-	 * @param string $Name
-	 * @param string $Value
+	 * @param string $Element element name
+	 * @param string $Name style name
+	 * @param string $Value style value
 	 *
-	 * @return void
+	 * @throws MarC_Exception
 	 *
-	 * @throws MarC_Exception if element name was not set
-	 * @throws MarC_Exception if style name was not set
-	 *
-	 * @example Set_AllElementsStyles('li', 'font-family', 'sans-serif');
+	 * @example Set_AllElementsStyles('li', 'font-family', 'sans-serif'); to set style "font-family" with value "sans-serif" to element <li>
 	 */
 	protected function Set_AllElementsStyles($Element, $Name, $Value="")
 	{
@@ -283,16 +279,13 @@ trait StylesAttributesSetting
 	/**
 	 * sets attribute for global setting of styles and attributes
 	 *
-	 * @param string $Element
-	 * @param string $Name
-	 * @param string $Value
+	 * @param string $Element element name
+	 * @param string $Name attribute name
+	 * @param string $Value attribute value
 	 *
-	 * @return void
+	 * @throws MarC_Exception
 	 *
-	 * @throws MarC_Exception if element name was not set
-	 * @throws MarC_Exception if attribute name was not set
-	 *
-	 * @example Set_AllElementsAttributes('ul', 'id', 'example');
+	 * @example Set_AllElementsAttributes('ul', 'id', 'example');  to set attribute "id" with value "example" to element <ul>
 	 */
 	protected function Set_AllElementsAttributes($Element, $Name, $Value="")
 	{
@@ -332,16 +325,12 @@ trait StylesAttributesSetting
 	/**
 	 * sets style for selected setting of styles and attributes
 	 *
-	 * @param string $Position
-	 * @param string $Element
-	 * @param string $Name
-	 * @param string $Value
+	 * @param integer $Order index of element on which is style applied
+	 * @param string $Element element name
+	 * @param string $Name style name
+	 * @param string $Value style value
 	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if order (number index of appearance of used element in block) was not set
-	 * @throws MarC_Exception if element name was not set
-	 * @throws MarC_Exception if style name was not set
+	 * @throws MarC_Exception
 	 *
 	 * @example Set_SelectedElementsStyles(0, 'li', 'color', '#FEDCBA');
 	 */
@@ -420,16 +409,12 @@ trait StylesAttributesSetting
 	/**
 	 * sets attribute for selected setting of styles and attributes
 	 *
-	 * @param string $Position
-	 * @param string $Element
-	 * @param string $Name
-	 * @param string $Value
+	 * @param integer $Order index of element on which is style applied
+	 * @param string $Element element name
+	 * @param string $Name attribute name
+	 * @param string $Value attribute value
 	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if order (number index of appearance of used element in block) was not set
-	 * @throws MarC_Exception if element name was not set
-	 * @throws MarC_Exception if attribute name was not set
+	 * @throws MarC_Exception
 	 *
 	 * @example Set_SelectedElementsAttributes(0, 'div', 'id', 'example');
 	 */
@@ -507,8 +492,6 @@ trait StylesAttributesSetting
 	
 	/**
 	 * enables usage of attributes without set values
-	 *
-	 * @return void
 	 */
 	public function Set_EnableNoValueAttributes()
 	{
@@ -519,13 +502,10 @@ trait StylesAttributesSetting
 	 * sets characters used for separation of values for multivalue attributes;
 	 * has to be used before function Set_Attribute
 	 *
-	 * @param string $Attribute
-	 * @param string $Separator
+	 * @param string $Attribute attribute name
+	 * @param string $Separator character used to separate attribute values
 	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if attribute was not set
-	 * @throws MarC_Exception if separator was set wrong
+	 * @throws MarC_Exception
 	 *
 	 * @example Set_AllValuesSeparators('class', "\x20");
 	 */
@@ -545,7 +525,7 @@ trait StylesAttributesSetting
 	
 		try
 		{
-			if(!in_array($Separator, MarC::Show_Options_ValuesSeparation()))
+			if(!in_array($Separator, MarC::ShowOptions_ValuesSeparation()))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
@@ -556,7 +536,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_ValuesSeparation());
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::ShowOptions_ValuesSeparation());
 		}
 	}
 	
@@ -564,15 +544,11 @@ trait StylesAttributesSetting
 	 * sets characters used for separation of values for multivalue attributes;
 	 * has to be used before function Set_Attribute
 	 *
-	 * @param string $Element
-	 * @param string $Attribute
-	 * @param string $Separator
+	 * @param string $Element element name
+	 * @param string $Attribute attribute name
+	 * @param string $Separator character used to separate attribute values
 	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if element was not set
-	 * @throws MarC_Exception if attribute was not set
-	 * @throws MarC_Exception if separator was set wrong
+	 * @throws MarC_Exception
 	 *
 	 * @example Set_SelectedValuesSeparators('div', 'class');
 	 * @example Set_SelectedValuesSeparators('div', 'class', "\x20");
@@ -605,7 +581,7 @@ trait StylesAttributesSetting
 	
 		try
 		{
-			if(!in_array($Separator, MarC::Show_Options_ValuesSeparation()) )
+			if(!in_array($Separator, MarC::ShowOptions_ValuesSeparation()) )
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
@@ -616,7 +592,7 @@ trait StylesAttributesSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 2), MarC::Show_Options_ValuesSeparation());
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 2), MarC::ShowOptions_ValuesSeparation());
 		}
 	}
 }

@@ -19,7 +19,11 @@ use UniCAT\MethodScope;
  */
 final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_CodeGenerator, I_MarC_Options_InLineSetting, I_MarC_Placeholders
 {
-	use ConditionalComments, StylesAttributesSetting, CodeExport, Comments;
+	use ConditionalComments, StylesAttributesSetting, CodeExport, Comments
+	{
+		Add_Comments as private;
+		Add_ConditionalComments as private;
+	}
 	
 	/**
 	 * element name
@@ -59,9 +63,9 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	/**
 	 * sets used element
 	 *
-	 * @param string $Element
+	 * @param string $Element element name
 	 *
-	 * @throws MarC_Exception if element name was not set
+	 * @throws MarC_Exception
 	 *
 	 * @example new CodeGenerator('a');
 	 */
@@ -119,22 +123,22 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 * enables creation of in-line element;
 	 * allows insertion of text also to empty element
 	 *
-	 * @param string $Position position of text added to element represented by constant
+	 * @param string $Position position of text added to element
 	 *
-	 * @throws MarC_Exception if position was set by unsupported wrong
+	 * @throws MarC_Exception
 	 */
 	public function Set_EnableInLineElement($Position=MarC::MARC_OPTION_LEFT)
 	{
 		try
 		{
-			if(!in_array($Position, MarC::Show_Options_InlineSetting()))
+			if(!in_array($Position, MarC::ShowOptions_InlineSetting()))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_InLineSetting());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::ShowOptions_InLineSetting());
 		}
 
 		$this -> Enable_InLineElement = $Position;
@@ -144,18 +148,14 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 * disables indention of code;
 	 * only lines of chosen elements lost indention;
 	 *
-	 * @param string $Elements
-	 *
-	 * @return void
+	 * @param string $Elements element name
 	 *
 	 * @example Set_DisableIndention();
 	 * @example Set_DisableIndention('textarea');
 	 * @example Set_DisableIndention('textarea', 'form');
 	 */
 	public function Set_DisableIndention($Elements="")
-	{
-		$Elements = func_get_args();
-		
+	{		
 		switch(count($Elements))
 		{
 			/*
@@ -209,10 +209,10 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	/**
 	 * add style to element
 	 *
-	 * @param string $Name name of style
-	 * @param string $Value value of style
+	 * @param string $Name style name
+	 * @param string $Value style value
 	 *
-	 * @throws MarC_Exception if style name was not set
+	 * @throws MarC_Exception
 	 *
 	 * @example Set_Style('font-family', 'sans-serif');
 	 */
@@ -239,14 +239,10 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	/**
 	 * add attributes to element
 	 *
-	 * @param string $Name
-	 * @param string $Value
+	 * @param string $Name attribute name
+	 * @param string|array $Value attribute value(s)
 	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if attribute name was not set
-	 * @throws MarC_Exception if attribute value was not set (if attributes without value were not enabled)
-	 * @throws MarC_Exception if attribute value was not set as string, integer or double
+	 * @throws MarC_Exception
 	 *
 	 * @example Set_Attribute('id', 'example');
 	 * @example Set_Attribute('points', array(110, 225, 254, 100) );
@@ -291,13 +287,13 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 			{
 				try
 				{
-					if(!in_array(gettype($Value), MarC::Show_Options_Scalars()))
+					if(!in_array(gettype($Value), MarC::ShowOptions_Scalars()))
 					{
 						throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
 					}
 					else
 					{
-						if(in_array(gettype($Value), MarC::Show_Options_Scalars()))
+						if(in_array(gettype($Value), MarC::ShowOptions_Scalars()))
 						{
 							$this -> Set_AllElementsAttributes($this -> Element, $Name, $Value);
 						}
@@ -317,7 +313,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 								 * default option for sticking of multiple values;
 								 * if character was not set for current attribute
 								 */
-								$this -> Set_AllElementsAttributes($this -> Element, $Name, implode(MarC::Show_Options_ValuesSeparation()[1], $Value));
+								$this -> Set_AllElementsAttributes($this -> Element, $Name, implode(MarC::ShowOptions_ValuesSeparation()[1], $Value));
 							}
 							
 						}
@@ -325,7 +321,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 				}
 				catch(MarC_Exception $Exception)
 				{
-					$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), gettype($Value), MarC::Show_Options_Scalars());
+					$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), gettype($Value), MarC::ShowOptions_Scalars());
 				}
 			}
 		}
@@ -335,11 +331,10 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 * sets separator of values of attributes;
 	 * this function has to be in the front of functions for setting of attributes
 	 *
-	 * @param string $Attribute
-	 * @param string $Separator
+	 * @param string $Attribute attribute name
+	 * @param string $Separator character used to separate attribute values
 	 *
-	 * @throws MarC_Exception if attribute name was not set
-	 * @throws MarC_Exception if separator was not set
+	 * @throws MarC_Exception
 	 *
 	 * @example Set_ValuesSeparator('class', ',');
 	 */
@@ -359,14 +354,14 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		
 		try
 		{
-			if(in_array($Separator, MarC::Show_Options_ValuesSeparation()))
+			if(in_array($Separator, MarC::ShowOptions_ValuesSeparation()))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_ValuesSeparation());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::ShowOptions_ValuesSeparation());
 		}
 		
 		$this -> Set_AllValuesSeparators($Attribute, $Separator);
@@ -376,9 +371,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 * set text into element;
 	 * code generated by previous objects of class CodeGenerator is allowed
 	 *
-	 * @param string $Text
-	 *
-	 * @return void
+	 * @param string $Text just text that will be wrapped by element - or added before or after element
 	 *
 	 * @throws MarC_Exception if it was set and empty element was used without using of function Set_InLineElement
 	 * @throws MarC_Exception if it was not set as string, integer or double
@@ -404,14 +397,14 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		
 		try
 		{
-			if(!in_array(gettype($Text), MarC::Show_Options_Scalars()))
+			if(!in_array(gettype($Text), MarC::ShowOptions_Scalars()))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Text), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Text), MarC::ShowOptions_Scalars());
 		}
 
 		try
@@ -435,9 +428,9 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	}
 
 	/**
-	 * converts array of styles into text value of attribute style
+	 * converts array of styles into text attribute value style
 	 *
-	 * @param array $Styles
+	 * @param array $Styles styles
 	 *
 	 * @return string
 	 */
@@ -459,7 +452,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	/**
 	 * conversion of array of attributes to text
 	 *
-	 * @param array $Attributes
+	 * @param array $Attributes attributes
 	 *
 	 * @return string
 	 */
@@ -633,7 +626,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	/**
 	 * assembles part of code
 	 *
-	 * @return string
+	 * @return string assembled code
 	 */
 	private function Get_AssembledCode($Parts)
 	{
@@ -716,9 +709,9 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	/**
 	 * assembling of code
 	 *
-	 * @return string|void
+	 * @return string|void generated code or nothing
 	 *
-	 * @throws MarC_Exception if closed element was used and text for wrapping was not prepared (at least empty)
+	 * @throws MarC_Exception
 	 */
 	public function Execute()
 	{
@@ -800,8 +793,9 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		 * exports code
 		 */
 		MarC::Set_ExportWay(static::$ExportWay);
-		MarC::Add_ConditionalComment($this -> LocalCode, static::$ConditionalComments);
+		MarC::Add_ConditionalComments($this -> LocalCode, static::$ConditionalComments);
 		MarC::Add_Comments($this -> LocalCode, static::$Comments);
+		static::$Comments = FALSE;
 		return MarC::Convert_Code($this -> LocalCode, __CLASS__);
 	}
 }

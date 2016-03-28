@@ -28,17 +28,15 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * );
 	 *
 	 * @static
-	 * @var array
+	 * @var array list of elements with their siblings
 	 */
 	protected static $AvailableElements = array();
 	
 	/**
 	 * direct access for function Set_ElementList
 	 *
-	 * @param string $File
-	 * @param boolean $ResetList
-	 *
-	 * @return void
+	 * @param string $File DTD file
+	 * @param boolean $ResetList to start new list of elements or not (and add next elements)
 	 *
 	 * @example new ElementListSetting('example.dtd');
 	 * @example new ElementListSetting('example.dtd', TRUE);
@@ -57,11 +55,10 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	/**
 	 * prevents using of non-public functions
 	 *
-	 * @param string $Method name of function
-	 * @param array $Parameters function's parameters
+	 * @param string $Method function name
+	 * @param array $Parameters function parameter values - arguments
 	 * 
-	 * @throws MarC_Exception if function does not exist
-	 * @throws MarC_Exception if function is not public
+	 * @throws MarC_Exception
 	 */
 	public function __call($Method, $Parameters)
 	{
@@ -69,7 +66,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		{
 			if(method_exists($this, $Method))
 			{
-				if(MethodScope::Check_IsPublic(__CLASS__, $Method))
+				if(MethodScope::Check_IsPublic(get_called_class(), $Method))
 				{
 					call_user_func_array($Method, $Parameters);
 				}
@@ -93,13 +90,10 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * setting of file with element definition;
 	 * setting if new set will be created or original list will be extended
 	 *
-	 * @param string $File
-	 * @param boolean $ResetList
+	 * @param string $File DTD file
+	 * @param boolean $ResetList to start new list of elements or not (and add next elements)
 	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if list of available elements was reset by wrong option
-	 * @throws MarC_Exception if list of available elements was not prepared
+	 * @throws MarC_Exception
 	 *
 	 * @example Set_ElementList('example.dtd');
 	 * @example Set_ElementList('example.dtd', TRUE);
@@ -110,6 +104,18 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		 * disables multiple new lines and shortens code in that way
 		 */
 		MarC::Set_DisableMultipleNewLines();
+
+		try
+		{
+			if(empty($File))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
+		}
 
 		try
 		{
@@ -126,7 +132,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		try
 		{
 			/*
-			 * parameter $XMLStyle may be fully empty;
+			 * parameter $ResetList may be fully empty;
 			 * or there must be used TRUE or FALSE
 			 */
 			if($ResetList !== FALSE && $ResetList !== TRUE)
@@ -136,7 +142,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		}
 		catch (MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_Booleans());
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::ShowOptions_Booleans());
 		}
 		
 		self::$AvailableElements = ($ResetList === TRUE) ? array() : self::$AvailableElements;		
@@ -148,21 +154,30 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * adds one element to element list;
 	 * alternative to main function for cases if dtd file is not available
 	 *
-	 * @param string $Open name of element
-	 * @param string|array $Siblings allowed siblings or construction orders
+	 * @param string $Open element name
+	 * @param string|array $Siblings allowed siblings
 	 *
-	 * @return void
+	 * @throws MarC_Exception
 	 *
-	 * @throws MarC_Exception if element names were not set
-	 * @throws MarC_Exception if element names do not match PTRN of element name
-	 *
-	 * @example Set_AddElement('example');
-	 * @example Set_AddElement('example', '#PCDATA');
-	 * @example Set_AddElement('example', 'usage');
-	 * @example Set_AddElement('example', array('usage', ...) )
+	 * @example Set_AddElement('example'); to add empty element <example>
+	 * @example Set_AddElement('example', '#PCDATA'); to add element <example> without any sibling
+	 * @example Set_AddElement('example', 'usage'); to add element <example> with only one sibling, <usage>
+	 * @example Set_AddElement('example', array('usage', ...) ); to add element <example> with more siblings
 	 */
 	public function Set_AddElement($Name, $Siblings=MarC::MARC_OPTION_EMPTY)
-	{		
+	{
+		try
+		{
+			if(empty($Name))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
+		}
+
 		try
 		{
 			if(!preg_match(MarC::MARC_XPSN_ADDELMT_NAME, $Name))
@@ -189,14 +204,14 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		
 		try
 		{
-			if(is_string($Siblings) && !in_array($Siblings, MarC::Show_Options_ElementSetting()))
+			if(is_string($Siblings) && !in_array($Siblings, MarC::ShowOptions_ElementSetting()))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::Show_Options_ElementSetting());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::ShowOptions_ElementSetting());
 		}
 		
 		switch($Siblings)
@@ -225,16 +240,12 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * element validity means that given elements are present in list of available elemewnt and that they can be used as siblings/parents of else given elements;
 	 * index 0 = main element, index 1 = sibling of main element, index 2 = sibling of previous element ... and so on
 	 * 
-	 * @param string|array $Elements
+	 * @param string|array $Elements element name
 	 * 
-	 * @throws MarC_Exception if no element was given
-	 * @throws MarC_Exception if one element was given
-	 * @throws MarC_Exception if any else level than last is array
-	 * @throws MarC_Exception if elements are not valid
+	 * @throws MarC_Exception
  	 */
 	protected function Check_ElementTreeValidity($Elements)
 	{
-		$Elements = func_get_args();
 		$Error = NULL;
 		
 		try
@@ -250,7 +261,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Elements[$Error]), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Elements[$Error]), MarC::ShowOptions_Scalars());
 		}
 
 		try
@@ -334,9 +345,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	/**
 	 * extraction of element set from given file
 	 *
-	 * @param string $File
-	 *
-	 * @return void
+	 * @param string $File DTD file
 	 */
 	private function Get_ElementList($File)
 	{
@@ -373,10 +382,10 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	/**
 	 * pairing of siblings to parent element
 	 *
-	 * @param string $ElementSetting
-	 * @param array $Entities
+	 * @param string $ElementSetting raw list of siblings as is extracted from DTD file
+	 * @param array $Entities list of entities extrtacted from DTD file
 	 *
-	 * @return array
+	 * @return array|string list of siblings, EMPTY, #PCDATA or list of siblings with #PCDATA
 	 */
 	private function Get_Siblings($ElementSetting, $Entities)
 	{
@@ -409,11 +418,9 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	}
 	
 	/**
-	 * prepares simplified associative array of items with form [EntityName] => EntitySetting
+	 * prepares simplified associative array of items with form [EntityName] => EntityValue
 	 *
 	 * @param array $Entities entities extracted from DTD file
-	 *
-	 * @return void
 	 */
 	private function Convert_SimplifyEntities(&$Entities)
 	{	
@@ -433,8 +440,6 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
 	 * prepares entities for later using in replacement of entities used in elements setting of siblings
 	 * 
 	 * @param array $Entities simplified array given by extraction from DTD file
-	 * 
-	 * @return array
 	 */
 	private function Convert_PrepareEntities(&$Entities)
 	{

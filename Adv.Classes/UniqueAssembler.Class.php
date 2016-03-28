@@ -16,10 +16,18 @@ use UniCAT\MethodScope;
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
  * generation of row of unique elements
+ *
+ * @method void Set_Element_Style(string $Name, string $Value); sets element style (use name of element instead "Element")
+ * @method void Set_Element_Attribute(string $Name, string $Value); sets element attribute (use name of element instead "Element")
+ * @method void Set_Elůement_ValuesSeparator(string $Attribute, string $Separator); sets separator of element attribute values (use name of element instead "Element")
  */
 class UniqueAssembler extends ElementListSetting
 {
-	use ConditionalComments, StylesAttributesSetting, CodeExport, Comments;
+	use ConditionalComments, StylesAttributesSetting, CodeExport, Comments
+	{
+		Add_Comments as private;
+		Add_ConditionalComments as private;
+	}
 	
 	/**
 	 * list of orders - used to check if all styles and attributes were set correctly
@@ -51,6 +59,12 @@ class UniqueAssembler extends ElementListSetting
 	 * @var string
 	 */
 	protected $ElementsNamespace = FALSE;
+	/**
+	 * object for class CodeGenerator
+	 *
+	 * @var object
+	 */
+	private $UniqueAssembler = FALSE;
 	
 	/**
 	 * sets elements for main (top) and secondary (sub) level;
@@ -58,8 +72,6 @@ class UniqueAssembler extends ElementListSetting
 	 *
 	 * @param string|array $TopElement
 	 * @param string|array $SubElements
-	 *
-	 * @return void
 	 *
 	 * @throws MarC_Exception if top element was not set
 	 * @throws MarC_Exception if sub elements was not set
@@ -168,14 +180,15 @@ class UniqueAssembler extends ElementListSetting
 	/**
 	 * prevents sharing of content with following instances;
 	 * erases non-static variables
-	 *
-	 * @return void
 	 */
 	public function __destruct()
 	{
 		$this -> Content = array();
 		$this -> UsedOrders = array();
 		$this -> Disable_TopLevel = FALSE;
+		$this -> Elements = array();
+		$this -> ElementsNamespace = FALSE;
+		$this -> UniqueAssembler = FALSE;
 	}
 	
 	/**
@@ -253,12 +266,9 @@ class UniqueAssembler extends ElementListSetting
 	/**
 	 * sets content
 	 *
-	 * @param string $Item
+	 * @param string $Item array value
 	 *
-	 * @return void
-	 *
-	 * @throws MarC_Exception if content item was set wrong
-	 * @throws MarC_Exception if content item was not as string, integer or double
+	 * @throws MarC_Exception
 	 *
 	 * @example Set_Content('example');
 	 */
@@ -266,25 +276,21 @@ class UniqueAssembler extends ElementListSetting
 	{
 		try
 		{
-			if(!empty($Item) && !in_array(gettype($Item), MarC::Show_Options_Scalars()))
+			if(!empty($Item) && !in_array(gettype($Item), MarC::ShowOptions_Scalars()))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Item[0]), MarC::Show_Options_Scalars());
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), gettype($Item[0]), MarC::ShowOptions_Scalars());
 		}
 		
-		/*
-		 * sets content to needed form of associative array
-		 */
 		$this -> Content[] = $Item;
 	}
 	
 	/**
 	 * disables generation of top level element;
-	 * useful for generation of page's <head>, where more elements (meta, title, script, link ...) are present;
 	 * usage of this function may be accidentally avoided with using of empty argument (using argument as '')
 	 */
 	public function Set_DisableTopLevel()
@@ -296,7 +302,7 @@ class UniqueAssembler extends ElementListSetting
 	 * allows using of namespaced elements - because __call is not designed to use namespaced elements directly;
 	 * it is not allowed to combine namespaces
 	 *
-	 * @return void
+	 * @throws MarC_Exception
 	 *
 	 * @example Set_ElementsNamespace('xsl');
 	 */
@@ -364,7 +370,7 @@ class UniqueAssembler extends ElementListSetting
 		$Order = $Parts['Order'];
 		$Element = $this -> ElementsNamespace == FALSE ? strtolower($Parts['Element']) : $this -> ElementsNamespace.':'.strtolower($Parts['Element']);
 			
-		if(in_array($Parameters[1], MarC::Show_Options_ValuesSeparation()))
+		if(in_array($Parameters[1], MarC::ShowOptions_ValuesSeparation()))
 		{
 			array_unshift($Parameters, $Element);
 			call_user_func_array(array($this, 'Set_SelectedValuesSeparators'), $Parameters);
@@ -387,7 +393,7 @@ class UniqueAssembler extends ElementListSetting
 			 * part 1;
 			 * sets name of element
 			 */
-			$VMaX = new CodeGenerator($this -> Elements['sub'][$Order]);
+			$this -> UniqueAssembler = new CodeGenerator($this -> Elements['sub'][$Order]);
 			
 			/*
 			 * part 2;
@@ -397,7 +403,7 @@ class UniqueAssembler extends ElementListSetting
 			{
 				foreach($this -> ElementStyles_Global[$this -> Elements['sub'][$Order]] AS $Name => $Value)
 				{
-					$VMaX -> Set_Style($Name, $Value);
+					$this -> UniqueAssembler -> Set_Style($Name, $Value);
 				}
 			}
 			
@@ -409,7 +415,7 @@ class UniqueAssembler extends ElementListSetting
 			{
 				foreach($this -> ElementAttributes_Global[$this -> Elements['sub'][$Order]] AS $Name => $Value)
 				{
-					$VMaX -> Set_Attribute($Name, $Value);
+					$this -> UniqueAssembler -> Set_Attribute($Name, $Value);
 				}
 			}
 			
@@ -420,7 +426,7 @@ class UniqueAssembler extends ElementListSetting
 			 */
 			if(self::$AvailableElements[$this -> Elements['sub'][$Order]]['Siblings'] != 'EMPTY')
 			{
-				$VMaX -> Set_Text((empty($this -> Content[$Order]) ? '' : $this -> Content[$Order] ));
+				$this -> UniqueAssembler -> Set_Text((empty($this -> Content[$Order]) ? '' : $this -> Content[$Order] ));
 			}
 			
 			/*
@@ -432,12 +438,12 @@ class UniqueAssembler extends ElementListSetting
 			{
 				if($Order < count($this -> Content)-1 )
 				{
-					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_GOON);
-					$VMaX -> Execute();
+					$this -> UniqueAssembler -> Set_ExportWay(UniCAT::UNICAT_OPTION_GOON);
+					$this -> UniqueAssembler -> Execute();
 				}
 				else
 				{
-					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
+					$this -> UniqueAssembler -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
 					$this -> LocalCode = $VMaX -> Execute();
 
 					/*
@@ -458,13 +464,13 @@ class UniqueAssembler extends ElementListSetting
 			{
 				if($Order < count($this -> Content)-1 )
 				{
-					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_GOON);
-					$VMaX -> Execute();
+					$this -> UniqueAssembler -> Set_ExportWay(UniCAT::UNICAT_OPTION_GOON);
+					$this -> UniqueAssembler -> Execute();
 				}
 				else
 				{
-					$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
-					$this -> LocalCode = $VMaX -> Execute();
+					$this -> UniqueAssembler -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
+					$this -> LocalCode = $this -> UniqueAssembler -> Execute();
 				}
 			}
 		}
@@ -479,8 +485,8 @@ class UniqueAssembler extends ElementListSetting
 			 * sets name of element;
 			 * set way how code will be exported
 			 */
-			$VMaX = new CodeGenerator($this -> Elements['top']);
-			$VMaX -> Set_ExportWay(UniCAT::UNICAT_OPTION_SKIP);
+			$this -> UniqueAssembler = new CodeGenerator($this -> Elements['top']);
+			$this -> UniqueAssembler -> Set_ExportWay(UniCAT::UNICAT_OPTION_SKIP);
 			
 			/*
 			 * part 2;
@@ -490,7 +496,7 @@ class UniqueAssembler extends ElementListSetting
 			{
 				foreach($this -> ElementStyles_Global[$this -> Elements['top']] AS $Name => $Value)
 				{
-					$VMaX -> Set_Style($Name, $Value);
+					$this -> UniqueAssembler -> Set_Style($Name, $Value);
 				}
 			}
 			
@@ -502,7 +508,7 @@ class UniqueAssembler extends ElementListSetting
 			{
 				foreach($this -> ElementAttributes_Global[$this -> Elements['top']][0] AS $Name => $Value)
 				{
-					$VMaX -> Set_Attribute($Name, $Value);
+					$this -> UniqueAssembler -> Set_Attribute($Name, $Value);
 				}
 			}
 			
@@ -511,8 +517,8 @@ class UniqueAssembler extends ElementListSetting
 			 * sets text of sub-level code to being wrapped by element of top-level;
 			 * stores generated code into help variable - to it could be exported
 			 */
-			$VMaX -> Set_Text($this -> LocalCode);
-			$this -> LocalCode = $VMaX -> Execute();
+			$this -> UniqueAssembler -> Set_Text($this -> LocalCode);
+			$this -> LocalCode = $this -> UniqueAssembler -> Execute();
 			
 			/*
 			 * sets way how code will be exported;

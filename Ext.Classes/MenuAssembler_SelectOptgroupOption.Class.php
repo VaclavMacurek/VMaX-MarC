@@ -19,14 +19,10 @@ final class MenuAssembler_SelectOptgroupOption extends DualAssembler
 {
 	/**
 	 * sets used elements
-	 *
-	 * @return void
 	 */
 	public function __construct()
 	{
 		parent::__construct('select', 'optgroup', 'option');
-		$this -> Set_Comment('menu start', UniCAT::UNICAT_OPTION_ABOVE);
-		$this -> Set_Comment('menu end', UniCAT::UNICAT_OPTION_BELOW);
 		$this -> Set_MiddleLevelContentAttribute('label');
 		$this -> Set_SubLevelContentAttribute('value');
 		$this -> Set_ChoiceAttribute('selected');
@@ -34,8 +30,6 @@ final class MenuAssembler_SelectOptgroupOption extends DualAssembler
 	
 	/**
 	 * erases non-static variables of parent class
-	 *
-	 * @return void
 	 */
 	public function __destruct()
 	{

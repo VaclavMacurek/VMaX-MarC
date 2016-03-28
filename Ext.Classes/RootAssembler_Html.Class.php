@@ -16,8 +16,6 @@ final class RootAssembler_Html extends UniqueAssembler
 {
 	/**
 	 * sets used elements
-	 *
-	 * @return void
 	 */
 	public function __construct()
 	{
@@ -26,8 +24,6 @@ final class RootAssembler_Html extends UniqueAssembler
 	
 	/**
 	 * erases non-static variables of parent class
-	 *
-	 * @return void
 	 */
 	public function __destruct()
 	{

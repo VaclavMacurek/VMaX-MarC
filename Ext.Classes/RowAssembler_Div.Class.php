@@ -19,8 +19,6 @@ final class RowAssembler_Div extends SimpleAssembler
 {
 	/**
 	 * sets used elements
-	 *
-	 * @return void
 	 */
 	public function __construct()
 	{

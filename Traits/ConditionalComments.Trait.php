@@ -28,27 +28,22 @@ trait ConditionalComments
 	/**
 	 * sets comment's text and position
 	 *
-	 * @param string $Text
-	 * @param string $Position
+	 * @param string $Comment full text of conditional comment or rather constant that represents it
 	 *
-	 * @return void
+	 * @throws MarC_Exception
 	 *
-	 * @throws UniCAT_Exception if comment was not set
-	 * @throws UniCAT_Exception if position setting was set wrong
-	 *
-	 * @example Set_Comment('example comment');
-	 * @example Set_Comment('example comment', UniCAT\UniCAT::UNICAT_OPTION_ABOVE);
+	 * @example Set_ConditionalComment(MarC\MarC::MARC_CODE_CONDCOMMENT_IE); to use basic IE conditional comment
 	 */
-	public function Set_ConditionalComment($Comment="")
+	public function Set_ConditionalComment($Comment)
 	{
 		try
 		{
 			if(empty($Comment))
 			{
-				throw new UniCAT_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
 			}
 		}
-		catch(UniCAT_Exception $Exception)
+		catch(MarC_Exception $Exception)
 		{
 			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
@@ -57,10 +52,10 @@ trait ConditionalComments
 		{
 			if(!in_array($Comment, ClassScope::Get_ConstantsValues('MarC\I_MarC_Texts_ConditionalComments')))
 			{
-				throw new UniCAT_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
 			}
 		}
-		catch(UniCAT_Exception $Exception)
+		catch(MarC_Exception $Exception)
 		{
 			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), ClassScope::Get_ConstantsNames('MarC\I_MarC_Texts_ConditionalComments'));
 		}
@@ -71,18 +66,25 @@ trait ConditionalComments
 	/**
 	 * adds conditional comments into final code
 	 * 
-	 * @param string $Code
-	 * @param string $Comments name should be rather only "Comment" - but HTML IE's conditional comments are inserted in pair
+	 * @param string $Code code that is inserted into conditional comment
+	 * @param string $Comments conditional comment
 	 * 
-	 * @return void
-	 * 
-	 * @throws UniCAT_Exception if $Code is empty
-	 * @throws UniCAT_Exception if $Code is not string
-	 * @throws UniCAT_Exception if $Comments is empty
-	 * @throws UniCAT_Exception if $Comments option is not valid (if it is not available)
+	 * @throws MarC_Exception
 	 */
-	public static function Add_ConditionalComment(&$Code="", $Comments="")
-	{	
+	public static function Add_ConditionalComments(&$Code, $Comments="")
+	{
+		try
+		{
+			if(empty($Code))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
+		}
+
 		if(!empty($Comments))
 		{
 			$Code = sprintf($Comments, $Code);

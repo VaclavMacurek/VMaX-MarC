@@ -14,9 +14,11 @@ use UniCAT\ClassScope;
  *
  * @license GNU LESSER GENERAL PUBLIC LICENSE version 3.0
  *
- * generation of empty elements with fluent interface;
+ * generation of elements with fluent interface;
  * provides easy creation of element as in-line, between other text
  *
+ * @method void Set_Comment(string $Comment) sets comment
+ * @method void Set_ConditionalComment(string $Comment) sets conditional comment
  * @method void Set_Attribute(string $Name, string $Value) sets attribute
  * @method void Set_Style(string $Name, string $Value) sets style
  * @method void Set_ValuesSeparator() sets separator for multi-values
@@ -25,14 +27,14 @@ use UniCAT\ClassScope;
  * @method void Set_Text(string $Text) sets text wrapped by element
  * @method void Execute() executes code generation
  */
-class SingleElement extends ElementListSetting
+class FluentElement extends ElementListSetting
 {
 	/**
 	 * object for class CodeGenerator
 	 *
 	 * @var object
 	 */
-	protected $SingleElement;
+	protected $FluentElement;
 	/**
 	 * list of available functions;
 	 * given by private function Get_AvailableMethods();
@@ -44,10 +46,9 @@ class SingleElement extends ElementListSetting
 	/**
 	 * sets used element
 	 *
-	 * @param string $Element
+	 * @param string $Element element name
 	 *
-	 * @throws MarC_Exception if element name was not set
-	 * @throws MarC_Exception if element cannot be used (because only empty elements are invited)
+	 * @throws MarC_Exception
 	 *
 	 * @example new CodeGenerator('hr');
 	 */
@@ -74,25 +75,20 @@ class SingleElement extends ElementListSetting
 			 * option SKIP causes that code of this object will be only exported, without saving anywhere;
 			 * see function Execute of CodeGenerator for details
 			 */
-			$this -> SingleElement = new CodeGenerator($Element);
-			$this -> SingleElement -> Set_ExportWay(UniCAT::UNICAT_OPTION_SKIP);
+			$this -> FluentElement = new CodeGenerator($Element);
+			$this -> FluentElement -> Set_ExportWay(UniCAT::UNICAT_OPTION_SKIP);
 		}
 	}
 
 	/**
 	 * allows to call public functions of class CodeGenerator defined in this class;
-	 * functions from traits are excluded;
 	 * using of function Set_DisableIndention is deprecated (or rather useless) for purpose of class to provide creation of in-line elements between text
 	 *
-	 * @param string $Element
+	 * @param string $Element element name
 	 *
-	 * @throws MarC_Exception if element name was not set
+	 * @return self
 	 *
-	 * @example Set_Style('width', '100%') to set style width 100%
-	 * @example Set_Attribute('colspan', 2) to set attribute colspan for mergin two table cells
-	 * @example Set_ValuesSeparator('class', "\x20") to set space as separator of values in attribute class
-	 * @example Set_EnableInLineElement() to set that text will be to the left of element (in the front of, in left-to-right writing common)
-	 * @example Set_DisableIndention() to erase indention (by tabelators) in the front of chosen element
+	 * @throws MarC_Exception
 	 */
 	public function __call($Method, $Parameters)
 	{
@@ -102,11 +98,11 @@ class SingleElement extends ElementListSetting
 			{
 				if($Method == 'Execute')
 				{
-					return $this -> SingleElement -> Execute();
+					return $this -> FluentElement -> Execute();
 				}
 				else
 				{
-					call_user_func_array(array($this -> SingleElement, $Method), $Parameters);
+					call_user_func_array(array($this -> FluentElement, $Method), $Parameters);
 					return $this;
 				}
 			}
@@ -124,27 +120,37 @@ class SingleElement extends ElementListSetting
 	/**
 	 * starts chain of functions in fluent interface
 	 *
-	 * @param string $Element
+	 * @param string $Element element name
 	 *
-	 * @return \MarC\SingleElement
+	 * @return FluentElement
+	 *
+	 * @example Element('a') for creation element <a>
 	 */
 	public static function Element($Element)
 	{
-		return new SingleElement($Element);
+		try
+		{
+			if(empty($Element))
+			{
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING);
+			}
+			else
+			{
+				return new FluentElement($Element);
+			}
+		}
+		catch(MarC_Exception $Exception)
+		{
+			$Exception -> ExceptionWarning(get_called_class(), $this -> Get_CallerFunctionName(), MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__) );
+		}
 	}
 
 	/**
 	 * creates list of functions usable for object of CodeGenerator;
-	 * list of usable functions is given by deleting of functions defined in linked trait for comments from all available functions
+	 * currently mostly useless - because ClassScope::Get_PublicMethods() may be used instead it with the same result
 	 */
 	private function Get_AvailableMethods()
 	{
-		/*
-		 * the top two lines may be merged into one;
-		 * this is for easy reading
-		 */
 		$this -> Methods = ClassScope::Get_PublicMethods('MarC\CodeGenerator');
-		$this -> Methods = array_diff($this -> Methods, ClassScope::Get_PublicMethods('UniCAT\Comments'));
-		$this -> Methods = array_diff($this -> Methods, ClassScope::Get_PublicMethods('UniCAT\CodeExport'));
 	}
 }

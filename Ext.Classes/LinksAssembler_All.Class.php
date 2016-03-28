@@ -18,8 +18,6 @@ final class LinksAssembler_All extends SimpleAssembler
 {
 	/**
 	 * sets used elements
-	 *
-	 * @return void
 	 */
 	public function __construct()
 	{
@@ -30,8 +28,6 @@ final class LinksAssembler_All extends SimpleAssembler
 	
 	/**
 	 * erases non-static variables of parent class
-	 *
-	 * @return void
 	 */
 	public function __destruct()
 	{
