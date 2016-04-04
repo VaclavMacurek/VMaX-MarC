@@ -87,7 +87,7 @@ trait ConditionalComments
 
 		if(!empty($Comments))
 		{
-			$Code = sprintf($Comments, $Code);
+			$Code = sprintf($Comments, preg_replace('/\n/', "\n\t", $Code));
 		}
 		else
 		{

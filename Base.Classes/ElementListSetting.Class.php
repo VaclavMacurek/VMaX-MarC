@@ -246,6 +246,7 @@ class ElementListSetting implements I_MarC_Expressions_ElementsSetting
  	 */
 	protected function Check_ElementTreeValidity($Elements)
 	{
+		$Elements = func_get_args();
 		$Error = NULL;
 		
 		try

@@ -36,7 +36,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 *
 	 * @var array
 	 */
-	private $Text = array();
+	private $Text = FALSE;
 	/**
 	 * disables insertion of line-break inside element;
 	 * useful for usage of textarea
@@ -114,7 +114,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	public function __destruct()
 	{
 		$this -> Element = FALSE;
-		$this -> Text = array();
+		$this -> Text = FALSE;
 		$this -> Enable_OneLineElement = FALSE;
 		$this -> Enable_InLineElement = FALSE;
 	}
@@ -127,21 +127,9 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	 *
 	 * @throws MarC_Exception
 	 */
-	public function Set_EnableInLineElement($Position=MarC::MARC_OPTION_LEFT)
+	public function Set_EnableInLineElement()
 	{
-		try
-		{
-			if(!in_array($Position, MarC::ShowOptions_InlineSetting()))
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDOPTION);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), MarC::ShowOptions_InLineSetting());
-		}
-
-		$this -> Enable_InLineElement = $Position;
+		$this -> Enable_InLineElement = TRUE;
 	}
 	
 	/**
@@ -260,69 +248,65 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			$Exception -> ExceptionWarning(get_called_class(), __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__));
 		}
-
-		/*
-		 * attribute value may be empty;
-		 * empty values for attributes MUST be enabled by using of separated function (Set_EnableNoValueAttributes)
-		 */
-		try
-		{
-			if((empty($Value) && $Value != 0) && self::$Enable_NoValueAttributes == FALSE)
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_MISSING, MarC::MARC_XCPT_XPLN_EMPTYATTR);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), 'Set_EnableNoValueAttributes');
-		}
 		
 		if($this -> Check_AttributeName($Name))
 		{
-			if(self::$Enable_NoValueAttributes == TRUE)
+			try
 			{
-				$this -> Set_AllElementsAttributes($this -> Element, $Name, $Value);
-			}
-			else
-			{
-				try
+				if(!in_array(gettype($Value), MarC::ShowOptions_Scalars()))
 				{
-					if(!in_array(gettype($Value), MarC::ShowOptions_Scalars()))
+					throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
+				}
+				else
+				{
+					if(in_array(gettype($Value), MarC::ShowOptions_Scalars()))
 					{
-						throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
+						$this -> Set_AllElementsAttributes($this -> Element, $Name, $Value);
 					}
 					else
 					{
-						if(in_array(gettype($Value), MarC::ShowOptions_Scalars()))
+						if(key_exists($Name, $this -> ValuesSeparators_Global))
 						{
-							$this -> Set_AllElementsAttributes($this -> Element, $Name, $Value);
-						}
-						else
-						{
-							if(key_exists($Name, $this -> ValuesSeparators_Global))
+							/*
+							 * selected option for sticking of multiple values;
+							 * if character was set for current attribute
+							 */
+							if(self::$Enable_NoValueAttributes == TRUE)
 							{
-								/*
-								 * selected option for sticking of multiple values;
-								 * if character was set for current attribute
-								 */
-								$this -> Set_AllElementsAttributes($this -> Element, $Name, implode($this -> ValuesSeparators_Global[$Name], $Value));
+								$this -> Set_AllElementsAttributes($this -> Element, $Name, (!empty($Value) ? implode($this -> ValuesSeparators_Global[$Name], $Value) : '' ));
 							}
 							else
 							{
-								/*
+								if(!empty($Value))
+								{
+									$this -> Set_AllElementsAttributes($this -> Element, $Name, implode($this -> ValuesSeparators_Global[$Name], $Value));
+								}
+							}
+						}
+						else
+						{
+							/*
 								 * default option for sticking of multiple values;
 								 * if character was not set for current attribute
 								 */
-								$this -> Set_AllElementsAttributes($this -> Element, $Name, implode(MarC::ShowOptions_ValuesSeparation()[1], $Value));
+							if(self::$Enable_NoValueAttributes == TRUE)
+							{
+								$this -> Set_AllElementsAttributes($this -> Element, $Name, (!empty($Value) ? implode(MarC::ShowOptions_ValuesSeparation()[1], $Value) : '' ));
 							}
-							
+							else
+							{
+								if(!empty($Value))
+								{
+									$this -> Set_AllElementsAttributes($this -> Element, $Name, implode(MarC::ShowOptions_ValuesSeparation()[1], $Value));
+								}
+							}
 						}
 					}
 				}
-				catch(MarC_Exception $Exception)
-				{
-					$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), gettype($Value), MarC::ShowOptions_Scalars());
-				}
+			}
+			catch(MarC_Exception $Exception)
+			{
+				$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__, 1), gettype($Value), MarC::ShowOptions_Scalars());
 			}
 		}
 	}
@@ -385,18 +369,6 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	{
 		try
 		{
-			if(self::$AvailableElements[$this -> Element]['Siblings'] == 'EMPTY' && $this -> Enable_InLineElement == FALSE)
-			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_VAR, UniCAT::UNICAT_XCPT_SEC_VAR_DMDFUNCTION2);
-			}
-		}
-		catch(MarC_Exception $Exception)
-		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_VariableNameAsText($this -> Element), $this -> Element);
-		}
-		
-		try
-		{
 			if(!in_array(gettype($Text), MarC::ShowOptions_Scalars()))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_WRONGVALTYPE);
@@ -419,12 +391,12 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), $Text);
 		}
 
-		if(preg_match(MarC::MARC_XPSN_PSNELMT_GNRDCODE, $Text))
+		if(preg_match(MarC::MARC_XPSN_PSNELMT_GNRDCODE, $Text) || preg_match('/\n/', $Text))
 		{
 			$this -> Enable_OneLineElement = FALSE;
 		}
-		
-		$this -> Text[] = $Text;
+
+		$this -> Text = preg_replace('/\n/', "\n\t", $Text);
 	}
 
 	/**
@@ -469,161 +441,6 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 	}
 
 	/**
-	 * converts text in according with setting of in-line element and used element;
-	 * adds or deletes items of array of text
-	 *
-	 * @return array
-	 */
-	private function Convert_PrepareText()
-	{
-		if(self::$AvailableElements[$this -> Element]['Siblings'] == MarC::MARC_OPTION_EMPTY)
-		{
-			switch($this -> Enable_InLineElement)
-			{
-				case self::MARC_OPTION_LEFT:
-					if(count($this -> Text) == 0)
-					{
-						$this -> Text[] = '';
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 1)
-					{
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 2)
-					{
-						$this -> Text;
-					}
-					else
-					{
-						$this -> Text = array_slice($this -> Text, 0, 2);
-					}
-					break;
-				case self::MARC_OPTION_RIGHT:
-					if(count($this -> Text) == 0)
-					{
-						$this -> Text[] = '';
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 1)
-					{
-						array_unshift($this -> Text, '');
-					}
-					elseif(count($this -> Text) == 2)
-					{
-						return $this -> Text;
-					}
-					else
-					{
-						$this -> Text = array_slice($this -> Text, 0, 2);
-					}
-					break;
-				case self::MARC_OPTION_BOTH:
-					if(count($this -> Text) == 0)
-					{
-						$this -> Text[] = '';
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 1)
-					{
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 2)
-					{
-						$this -> Text;
-					}
-					else
-					{
-						$this -> Text = array_slice($this -> Text, 0, 2);
-					}
-					break;
-			}
-		}
-		else
-		{
-			switch($this -> Enable_InLineElement)
-			{
-				case self::MARC_OPTION_LEFT:
-					if(count($this -> Text) == 0)
-					{
-						$this -> Text[] = '';
-						$this -> Text[] = '';
-						$this -> Text[] = '';
-
-					}
-					elseif(count($this -> Text) == 1)
-					{
-						$this -> Text[] = '';
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 2)
-					{
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 3)
-					{
-						$this -> Text;
-					}
-					else
-					{
-						$this -> Text = array_slice($this -> Text, 0, 3);
-					}
-					break;
-				case self::MARC_OPTION_RIGHT:
-					if(count($this -> Text) == 0)
-					{
-						$this -> Text[] = '';
-						$this -> Text[] = '';
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 1)
-					{
-						array_unshift($this -> Text, '');
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 2)
-					{
-						array_unshift($this -> Text, '');
-					}
-					elseif(count($this -> Text) == 3)
-					{
-						$this -> Text;
-					}
-					else
-					{
-						$this -> Text = array_slice($this -> Text, 0, 3);
-					}
-					break;
-				case self::MARC_OPTION_BOTH:
-					if(count($this -> Text) == 0)
-					{
-						$this -> Text[] = '';
-						$this -> Text[] = '';
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 1)
-					{
-						array_unshift($this -> Text, '');
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 2)
-					{
-						$this -> Text[] = '';
-					}
-					elseif(count($this -> Text) == 3)
-					{
-						$this -> Text;
-					}
-					else
-					{
-						$this -> Text = array_slice($this -> Text, 0, 3);
-					}
-					break;
-			}
-		}
-	}
-
-	/**
 	 * assembles part of code
 	 *
 	 * @return string assembled code
@@ -634,14 +451,14 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 
 		try
 		{
-			if(count($Parts) != 4)
+			if(!in_array(count($Parts), array(3,4)))
 			{
-				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDEQARGS);
+				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRM, UniCAT::UNICAT_XCPT_SEC_PRM_DMDLMTDARGS1);
 			}
 		}
 		catch(MarC_Exception $Exception)
 		{
-			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), 4);
+			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, MethodScope::Get_ParameterName(__CLASS__, __FUNCTION__), 3, 4);
 		}
 
 		/*
@@ -656,7 +473,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		$Form = $Parts[0];
 		$Attributes = $Parts[1];
 		$Styles = $Parts[2];
-		$Text = $Parts[3];
+		$Text = (isset($Parts[3]) ? $Parts[3] : FALSE);
 		$AttributesStyles = FALSE;
 
 		if( ($Attributes != self::MARC_OPTION_NOATTR) && ($Styles != self::MARC_OPTION_NOSTL) )
@@ -678,31 +495,11 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 
 		if(self::$AvailableElements[$this -> Element]['Siblings'] != MarC::MARC_OPTION_EMPTY)
 		{
-			switch($this -> Enable_InLineElement)
-			{
-				case self::MARC_OPTION_LEFT:
-					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
-				case self::MARC_OPTION_RIGHT:
-					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
-				case self::MARC_OPTION_BOTH:
-					return sprintf($Form, $Text[0], $this -> Element, $AttributesStyles, $Text[1], self::$AvailableElements[$this -> Element]['ClosingPart'], $Text[2]);
-				default:
-					return sprintf($Form, $this -> Element, $AttributesStyles, $Text[0], self::$AvailableElements[$this -> Element]['ClosingPart']);
-			}
+			return sprintf($Form, $this -> Element, $AttributesStyles, $Text, self::$AvailableElements[$this -> Element]['ClosingPart']);
 		}
 		else
 		{
-			switch($this -> Enable_InLineElement)
-			{
-				case self::MARC_OPTION_LEFT:
-					return sprintf($Text[0], $Form, $this -> Element, $AttributesStyles, $Text[1]);
-				case self::MARC_OPTION_RIGHT:
-					return sprintf($Text[0], $Form, $this -> Element, $AttributesStyles, $Text[1]);
-				case self::MARC_OPTION_BOTH:
-					return sprintf($Text[0], $Form, $this -> Element, $AttributesStyles, $Text[1]);
-				default:
-					return sprintf($Form, $this -> Element, $AttributesStyles);
-			}
+			return sprintf($Form, $this -> Element, $AttributesStyles);
 		}
 	}
 	
@@ -733,7 +530,7 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		
 		try
 		{
-			if($IsClosedElement == TRUE && $this -> Text == FALSE)
+			if($IsClosedElement == TRUE && $this -> Text === FALSE)
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_VAR, UniCAT::UNICAT_XCPT_SEC_VAR_DMDFUNCTION2, MarC::MARC_XCPT_XPLN_CLOSEDELMT);
 			}
@@ -742,26 +539,19 @@ final class CodeGenerator extends ElementListSetting implements I_MarC_Texts_Cod
 		{
 			$Exception -> ExceptionWarning(__CLASS__, __FUNCTION__, $Exception -> Get_VariableNameAsText($this -> Element), $this -> Element, 'Set_Text');
 		}
-
-		$this -> Convert_PrepareText();
 		
 		/*
-		 * generation of code of empty element
+		 * generation of code of empty element;
+		 * generation of code of closed element
 		 */
 		if($IsClosedElement == FALSE)
 		{
-			$Form = ($this -> Enable_InLineElement == FALSE) ? self::MARC_CODE_ELEMENT_EMPTY_ML : self::MARC_CODE_ELEMENT_EMPTY_IN;
-			
-			$this -> LocalCode = $this -> Get_AssembledCode($Form, $Attributes, $Styles, $this -> Text);
+			$Form = ($this -> Enable_InLineElement == TRUE) ? self::MARC_CODE_ELEMENT_EMPTY_IN : self::MARC_CODE_ELEMENT_EMPTY_ML;
+			$this -> LocalCode = $this -> Get_AssembledCode($Form, $Attributes, $Styles);
 		}
-		/*
-		 * generation of code of closed element
-		 */
 		else
 		{
-			$Form = ($this -> Enable_OneLineElement == TRUE) ? self::MARC_CODE_ELEMENT_CLOSED_1L : ($this -> Enable_InLineElement != FALSE ? self::MARC_CODE_ELEMENT_CLOSED_IN : self::MARC_CODE_ELEMENT_CLOSED_ML);
-			
-			$this -> Text = preg_replace('/\n/', "\n\t", $this -> Text);
+			$Form = ($this -> Enable_InLineElement == TRUE) ? self::MARC_CODE_ELEMENT_CLOSED_IN : ($this -> Enable_OneLineElement == TRUE ? self::MARC_CODE_ELEMENT_CLOSED_1L : self::MARC_CODE_ELEMENT_CLOSED_ML);
 			$this -> LocalCode = $this -> Get_AssembledCode($Form, $Attributes, $Styles, $this -> Text);
 		}
 		

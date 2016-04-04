@@ -21,11 +21,11 @@ interface I_MarC_Exceptions
 	/**
 	 * explanation of empty element
 	 */
-	const MARC_XCPT_XPLN_EMPTYELMT = 'EXPLANATION: Empty element cannot wrap text - use called function to add text to the front of element or behind element';
+	const MARC_XCPT_XPLN_EMPTYELMT = 'EXPLANATION: Empty element cannot wrap text';
 	/**
 	 * explanation of closed element
 	 */
-	const MARC_XCPT_XPLN_CLOSEDELMT = 'EXPLANATION: Closed element has to wrap text - using of function Set_Text without parameter is valid';
+	const MARC_XCPT_XPLN_CLOSEDELMT = 'EXPLANATION: Closed element has to wrap text - use function Set_Text without argument';
 	/**
 	 * explanation of used element
 	 */

@@ -130,7 +130,7 @@ class UniqueAssembler extends ElementListSetting
 		
 		try
 		{
-			if(in_array($TopElement, $SubElements))
+			if(!empty($TopElement) && in_array($TopElement, $SubElements))
 			{
 				throw new MarC_Exception(UniCAT::UNICAT_XCPT_MAIN_CLS, UniCAT::UNICAT_XCPT_MAIN_FNC, UniCAT::UNICAT_XCPT_MAIN_PRMS, UniCAT::UNICAT_XCPT_SEC_PRMS_PRHBVALEQUAL);
 			}
@@ -444,7 +444,7 @@ class UniqueAssembler extends ElementListSetting
 				else
 				{
 					$this -> UniqueAssembler -> Set_ExportWay(UniCAT::UNICAT_OPTION_STEP);
-					$this -> LocalCode = $VMaX -> Execute();
+					$this -> LocalCode = $this -> UniqueAssembler -> Execute();
 
 					/*
 					 * sets way how code will be exported;
